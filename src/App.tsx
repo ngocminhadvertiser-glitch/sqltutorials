@@ -9,38 +9,56 @@ import { QuizzesModule } from './components/QuizzesModule';
 import { CompetencyReport } from './components/CompetencyReport';
 import { ErdNormalizationStudio } from './components/ErdNormalizationStudio';
 import { AiTutorModal } from './components/AiTutorModal';
-import { StudentProgress, CompetencyCategory, Exercise } from './types';
-import { BookOpen, CheckSquare, Award, HelpCircle } from 'lucide-react';
-
-const STORAGE_KEY = 'sql_master_student_progress_v1';
-
-const INITIAL_PROGRESS: StudentProgress = {
-  studentName: 'Nguyễn Minh Quân',
-  grade: 'Lớp 11 Tin Học - THPT',
-  completedLessons: ['bai-1-tong-quan-csdl'],
-  completedExercises: {},
-  quizScores: {},
-  streakDays: 4,
-  totalPoints: 25,
-  competencyScores: {
-    'tong-quan-csdl': 75,
-    'csdl-quan-he': 70,
-    'thiet-ke-rang-buoc': 60,
-    'truy-van-co-ban': 65,
-    'gom-nhom-thong-ke': 40,
-    'join-subquery': 35,
-    'thao-tac-du-lieu-dml': 50,
-    'dinh-nghia-du-lieu-ddl': 45,
-    'quan-tri-toan-ven': 30,
-    'du-an-tong-hop': 25,
-  },
-};
+import { AuthModal } from './components/AuthModal';
+import { BookmarksModule } from './components/BookmarksModule';
+import { LearningHistoryModule } from './components/LearningHistoryModule';
+import { 
+  StudentProgress, 
+  CompetencyCategory, 
+  Exercise, 
+  UserAccount, 
+  BookmarkItem,
+  Lesson,
+  QueryResult 
+} from './types';
+import { 
+  getCurrentUser, 
+  getAllAccounts, 
+  loginUser, 
+  registerUser, 
+  logoutUser, 
+  getUserProgress, 
+  saveUserProgress, 
+  addBookmarkToUser, 
+  removeBookmarkFromUser, 
+  updateUserBookmarkNotes,
+  addActivityLogToUser,
+  clearUserActivityLogs
+} from './services/authService';
+import { 
+  BookOpen, 
+  CheckSquare, 
+  Award, 
+  HelpCircle, 
+  Bookmark, 
+  History,
+  Sparkles,
+  UserCheck
+} from 'lucide-react';
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState<UserAccount>(() => getCurrentUser());
+  const [accounts, setAccounts] = useState<UserAccount[]>(() => getAllAccounts());
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
   const [activeTab, setActiveTab] = useState<string>('lessons');
   const [currentDbId, setCurrentDbId] = useState<string>('QuanLyHocSinh');
   const [isMobileDeviceFrame, setIsMobileDeviceFrame] = useState<boolean>(false);
   const [playgroundSql, setPlaygroundSql] = useState<string>('SELECT * FROM HocSinh;');
+
+  // Navigation targets from bookmarks/history
+  const [targetLessonId, setTargetLessonId] = useState<string | undefined>(undefined);
+  const [targetExerciseId, setTargetExerciseId] = useState<string | undefined>(undefined);
 
   // AI Tutor Modal state
   const [aiModal, setAiModal] = useState<{
@@ -55,43 +73,77 @@ export default function App() {
     contextTitle: undefined,
   });
 
-  // Local persistence for student learning progress
-  const [progress, setProgress] = useState<StudentProgress>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          ...parsed,
-          competencyScores: {
-            ...INITIAL_PROGRESS.competencyScores,
-            ...(parsed.competencyScores || {})
-          }
-        };
-      }
-    } catch (e) {
-      console.warn('Failed to load progress from localStorage', e);
-    }
-    return INITIAL_PROGRESS;
-  });
+  // Current user's learning progress and activity history
+  const [progress, setProgress] = useState<StudentProgress>(() => getUserProgress(currentUser.id));
 
+  // When user switches or registers, sync progress to state
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    } catch (e) {
-      console.warn('Failed to persist progress', e);
+    const userProg = getUserProgress(currentUser.id);
+    setProgress(userProg);
+  }, [currentUser.id]);
+
+  // Persist progress to local user storage
+  const updateProgress = (updater: (prev: StudentProgress) => StudentProgress) => {
+    setProgress((prev) => {
+      const next = updater(prev);
+      saveUserProgress(currentUser.id, next);
+      return next;
+    });
+  };
+
+  // Switch / Login user
+  const handleLogin = (identifier: string, password?: string) => {
+    const res = loginUser(identifier, password);
+    if (res.success && res.user) {
+      setCurrentUser(res.user);
+      setAccounts(getAllAccounts());
+      const loadedProgress = getUserProgress(res.user.id);
+      setProgress(loadedProgress);
+      return { success: true };
     }
-  }, [progress]);
+    return { success: false, error: res.error };
+  };
+
+  // Register user
+  const handleRegister = (data: { username: string; fullName: string; grade?: string; school?: string; password?: string }) => {
+    const res = registerUser(data);
+    if (res.success && res.user) {
+      setCurrentUser(res.user);
+      setAccounts(getAllAccounts());
+      const loadedProgress = getUserProgress(res.user.id);
+      setProgress(loadedProgress);
+      return { success: true };
+    }
+    return { success: false, error: res.error };
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    const guest = getCurrentUser();
+    setCurrentUser(guest);
+    setProgress(getUserProgress(guest.id));
+  };
 
   // Toggle completion of a lesson
   const handleToggleCompleteLesson = (lessonId: string) => {
-    setProgress((prev) => {
+    updateProgress((prev) => {
       const isDone = prev.completedLessons.includes(lessonId);
       const newCompleted = isDone
         ? prev.completedLessons.filter((id) => id !== lessonId)
         : [...prev.completedLessons, lessonId];
 
       const pointsDiff = isDone ? -10 : 10;
+
+      // Log activity if completed
+      if (!isDone) {
+        addActivityLogToUser(currentUser.id, {
+          type: 'lesson_completed',
+          title: `Hoàn thành bài học: ${lessonId}`,
+          detail: 'Đã hoàn thành phần lý thuyết & câu hỏi trắc nghiệm kiểm tra.',
+          pointsEarned: 10,
+          status: 'success',
+        });
+      }
 
       return {
         ...prev,
@@ -112,9 +164,18 @@ export default function App() {
     userSql: string,
     competency: CompetencyCategory
   ) => {
-    setProgress((prev) => {
+    updateProgress((prev) => {
       const alreadyDone = !!prev.completedExercises[exerciseId];
       const newScore = prev.totalPoints + (alreadyDone ? 0 : score);
+
+      addActivityLogToUser(currentUser.id, {
+        type: 'exercise_submitted',
+        title: `Nộp bài tập: ${exerciseId}`,
+        detail: `Lệnh SQL: ${userSql.slice(0, 100)}`,
+        pointsEarned: alreadyDone ? 0 : score,
+        status: score > 0 ? 'success' : 'failed',
+        metadata: { exerciseId, sql: userSql },
+      });
 
       return {
         ...prev,
@@ -142,9 +203,17 @@ export default function App() {
     isCorrect: boolean,
     competency: CompetencyCategory
   ) => {
-    setProgress((prev) => {
+    updateProgress((prev) => {
       const alreadyAnswered = !!prev.quizScores[quizId];
       const pointsDiff = isCorrect && !alreadyAnswered ? 5 : 0;
+
+      addActivityLogToUser(currentUser.id, {
+        type: 'quiz_answered',
+        title: `Trả lời câu hỏi trắc nghiệm: ${quizId}`,
+        detail: `Đáp án chọn: ${selectedOption} (${isCorrect ? 'Chính xác' : 'Chưa đúng'})`,
+        pointsEarned: pointsDiff,
+        status: isCorrect ? 'success' : 'failed',
+      });
 
       return {
         ...prev,
@@ -164,26 +233,123 @@ export default function App() {
     });
   };
 
-  const handleResetProgress = () => {
-    setProgress({
-      ...INITIAL_PROGRESS,
-      completedLessons: [],
-      completedExercises: {},
-      quizScores: {},
-      totalPoints: 0,
-      competencyScores: {
-        'tong-quan-csdl': 30,
-        'csdl-quan-he': 30,
-        'thiet-ke-rang-buoc': 30,
-        'truy-van-co-ban': 30,
-        'gom-nhom-thong-ke': 20,
-        'join-subquery': 15,
-        'thao-tac-du-lieu-dml': 20,
-        'dinh-nghia-du-lieu-ddl': 20,
-        'quan-tri-toan-ven': 10,
-        'du-an-tong-hop': 10,
+  // Log SQL execution in history
+  const handleLogSqlExecution = (sql: string, result: QueryResult) => {
+    addActivityLogToUser(currentUser.id, {
+      type: 'sql_executed',
+      title: result.success ? 'Thực thi SQL thành công' : 'Lỗi thực thi SQL',
+      detail: sql,
+      status: result.success ? 'success' : 'failed',
+      metadata: {
+        sql,
+        databaseId: currentDbId,
+        rowCount: result.data ? result.data.length : result.rowsAffected,
       },
     });
+    // refresh progress
+    setProgress(getUserProgress(currentUser.id));
+  };
+
+  // Bookmark handlers
+  const handleToggleBookmarkLesson = (lesson: Lesson) => {
+    const existing = (progress.bookmarks || []).find(
+      (b) => b.type === 'lesson' && b.targetId === lesson.id
+    );
+    if (existing) {
+      removeBookmarkFromUser(currentUser.id, existing.id);
+    } else {
+      addBookmarkToUser(currentUser.id, {
+        type: 'lesson',
+        title: lesson.title,
+        description: lesson.description,
+        targetId: lesson.id,
+        category: lesson.chapterTitle,
+        tags: [lesson.level, 'Lý thuyết'],
+      });
+    }
+    setProgress(getUserProgress(currentUser.id));
+  };
+
+  const handleToggleBookmarkExercise = (exercise: Exercise) => {
+    const existing = (progress.bookmarks || []).find(
+      (b) => b.type === 'exercise' && b.targetId === exercise.id
+    );
+    if (existing) {
+      removeBookmarkFromUser(currentUser.id, existing.id);
+    } else {
+      addBookmarkToUser(currentUser.id, {
+        type: 'exercise',
+        title: exercise.title,
+        description: exercise.description,
+        targetId: exercise.id,
+        category: `Bài tập • CSDL ${exercise.databaseId}`,
+        tags: [exercise.level, exercise.category || 'Truy vấn'],
+      });
+    }
+    setProgress(getUserProgress(currentUser.id));
+  };
+
+  const handleBookmarkSqlSnippet = (sql: string, note?: string) => {
+    addBookmarkToUser(currentUser.id, {
+      type: 'sql_snippet',
+      title: note || `Lệnh SQL ${new Date().toLocaleTimeString()}`,
+      sqlCode: sql,
+      description: 'Lưu từ trình soạn thảo SQL Playground.',
+      category: `CSDL ${currentDbId}`,
+      tags: ['T-SQL', currentDbId],
+    });
+    setProgress(getUserProgress(currentUser.id));
+  };
+
+  const handleBookmarkSqlExampleFromLesson = (
+    example: { title: string; sql: string; explanation: string },
+    lessonTitle: string
+  ) => {
+    addBookmarkToUser(currentUser.id, {
+      type: 'sql_snippet',
+      title: example.title,
+      sqlCode: example.sql,
+      description: example.explanation,
+      category: lessonTitle,
+      tags: ['Mẫu lệnh', 'Lý thuyết'],
+    });
+    setProgress(getUserProgress(currentUser.id));
+  };
+
+  const handleRemoveBookmark = (bookmarkId: string) => {
+    removeBookmarkFromUser(currentUser.id, bookmarkId);
+    setProgress(getUserProgress(currentUser.id));
+  };
+
+  const handleClearHistory = () => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử hoạt động cá nhân?')) {
+      clearUserActivityLogs(currentUser.id);
+      setProgress(getUserProgress(currentUser.id));
+    }
+  };
+
+  const handleResetProgress = () => {
+    if (window.confirm('Khôi phục tiến trình học tập của tài khoản này về ban đầu?')) {
+      updateProgress((prev) => ({
+        ...prev,
+        completedLessons: [],
+        completedExercises: {},
+        quizScores: {},
+        totalPoints: 0,
+        competencyScores: {
+          'tong-quan-csdl': 30,
+          'csdl-quan-he': 30,
+          'thiet-ke-rang-buoc': 30,
+          'truy-van-co-ban': 30,
+          'gom-nhom-thong-ke': 20,
+          'join-subquery': 15,
+          'thao-tac-du-lieu-dml': 20,
+          'dinh-nghia-du-lieu-ddl': 20,
+          'quan-tri-toan-ven': 10,
+          'du-an-tong-hop': 10,
+        },
+      }));
+    }
   };
 
   const handleSendToPlayground = (sql: string) => {
@@ -213,6 +379,10 @@ export default function App() {
           onToggleCompleteLesson={handleToggleCompleteLesson}
           onRunSqlInPlayground={handleSendToPlayground}
           onOpenErdStudio={() => setActiveTab('erd')}
+          bookmarks={progress.bookmarks || []}
+          onToggleBookmarkLesson={handleToggleBookmarkLesson}
+          onBookmarkSqlExample={handleBookmarkSqlExampleFromLesson}
+          initialSelectedLessonId={targetLessonId}
         />
       )}
 
@@ -230,6 +400,8 @@ export default function App() {
           setCurrentDbId={setCurrentDbId}
           initialSql={playgroundSql}
           onAskAiTutor={(sql, error) => handleOpenAiModal(sql, error, 'Chạy thử câu lệnh T-SQL')}
+          onBookmarkSql={handleBookmarkSqlSnippet}
+          onSqlExecuted={handleLogSqlExecution}
         />
       )}
 
@@ -249,7 +421,7 @@ export default function App() {
               <button
                 id="tab-mode-coding"
                 onClick={() => setExerciseMode('coding')}
-                className={`px-5 py-2 rounded-xl transition-all ${
+                className={`px-5 py-2 rounded-xl transition-all cursor-pointer ${
                   exerciseMode === 'coding'
                     ? 'bg-white text-indigo-700 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -260,7 +432,7 @@ export default function App() {
               <button
                 id="tab-mode-quiz"
                 onClick={() => setExerciseMode('quiz')}
-                className={`px-5 py-2 rounded-xl transition-all ${
+                className={`px-5 py-2 rounded-xl transition-all cursor-pointer ${
                   exerciseMode === 'quiz'
                     ? 'bg-white text-indigo-700 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -278,6 +450,9 @@ export default function App() {
               onAskAiTutor={(sql, error, context) =>
                 handleOpenAiModal(sql, error, context)
               }
+              bookmarks={progress.bookmarks || []}
+              onToggleBookmarkExercise={handleToggleBookmarkExercise}
+              initialSelectedExerciseId={targetExerciseId}
             />
           ) : (
             <QuizzesModule
@@ -286,6 +461,41 @@ export default function App() {
             />
           )}
         </div>
+      )}
+
+      {/* Tab: Bookmarks (Dấu trang) */}
+      {activeTab === 'bookmarks' && (
+        <BookmarksModule
+          bookmarks={progress.bookmarks || []}
+          onRemoveBookmark={handleRemoveBookmark}
+          onAddBookmark={(item) => {
+            addBookmarkToUser(currentUser.id, item);
+            setProgress(getUserProgress(currentUser.id));
+          }}
+          onUpdateBookmarkNotes={(bookmarkId: string, notes: string) => {
+            updateUserBookmarkNotes(currentUser.id, bookmarkId, notes);
+            setProgress(getUserProgress(currentUser.id));
+          }}
+          onGoToLesson={(lessonId: string) => {
+            setTargetLessonId(lessonId);
+            setActiveTab('lessons');
+          }}
+          onGoToExercise={(exerciseId: string) => {
+            setTargetExerciseId(exerciseId);
+            setActiveTab('exercises');
+            setExerciseMode('coding');
+          }}
+          onRunSqlInPlayground={handleSendToPlayground}
+        />
+      )}
+
+      {/* Tab: Learning History (Lịch sử) */}
+      {activeTab === 'history' && (
+        <LearningHistoryModule
+          activityLogs={progress.activityLogs || []}
+          onRunSqlInPlayground={handleSendToPlayground}
+          onClearHistory={handleClearHistory}
+        />
       )}
 
       {/* Tab 5: Personal Competency Evaluation & Progress Tracking */}
@@ -299,7 +509,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-100/60 font-sans text-slate-900 antialiased selection:bg-indigo-500 selection:text-white pb-20 lg:pb-12">
+    <div className="min-h-screen bg-slate-100/60 font-sans text-slate-900 antialiased selection:bg-indigo-500 selection:text-white pb-20 xl:pb-12">
       {/* Global Header */}
       <Header
         progress={progress}
@@ -309,7 +519,43 @@ export default function App() {
         setIsMobileDeviceFrame={setIsMobileDeviceFrame}
         currentDbId={currentDbId}
         setCurrentDbId={setCurrentDbId}
+        currentUser={currentUser}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
+
+      {/* Account Info Pill Banner on top */}
+      <div className="bg-indigo-900 text-indigo-100 text-xs py-1.5 px-4">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Học sinh: <strong className="text-white">{currentUser.fullName}</strong> ({currentUser.grade || 'Lớp 11 Tin học'})</span>
+            <span className="text-indigo-300">• {currentUser.school || 'Trường THPT Chuyên'}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveTab('bookmarks')}
+              className="hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              <Bookmark className="w-3.5 h-3.5 text-amber-300" />
+              <span>Dấu trang ({progress.bookmarks?.length || 0})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className="hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              <History className="w-3.5 h-3.5 text-indigo-300" />
+              <span>Lịch sử ({progress.activityLogs?.length || 0})</span>
+            </button>
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="bg-indigo-700/80 hover:bg-indigo-600 text-white font-bold px-2.5 py-0.5 rounded-lg text-[11px] transition-all cursor-pointer"
+            >
+              Đổi tài khoản
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Device Mode Wrapper */}
       {isMobileDeviceFrame ? (
@@ -339,7 +585,23 @@ export default function App() {
       )}
 
       {/* Mobile Bottom Navigation Bar */}
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BottomNav 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        bookmarkCount={progress.bookmarks?.length || 0}
+      />
+
+      {/* Authentication & User Profile Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser}
+        onUserChanged={(newUser) => {
+          setCurrentUser(newUser);
+          setAccounts(getAllAccounts());
+          setProgress(getUserProgress(newUser.id));
+        }}
+      />
 
       {/* AI Teacher Assistance Modal */}
       <AiTutorModal

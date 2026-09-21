@@ -17,7 +17,8 @@ import {
   ArrowRight,
   PlusCircle,
   FileCode2,
-  Wrench
+  Wrench,
+  Bookmark
 } from 'lucide-react';
 import { sqlEngine } from '../services/sqlEngine';
 import { QueryResult } from '../types';
@@ -27,6 +28,8 @@ interface SqlPlaygroundProps {
   setCurrentDbId: (id: string) => void;
   initialSql?: string;
   onAskAiTutor: (sql: string, error?: string) => void;
+  onBookmarkSql?: (sql: string, title?: string) => void;
+  onSqlExecuted?: (sql: string, result: QueryResult) => void;
 }
 
 export const SqlPlayground: React.FC<SqlPlaygroundProps> = ({
@@ -34,11 +37,14 @@ export const SqlPlayground: React.FC<SqlPlaygroundProps> = ({
   setCurrentDbId,
   initialSql = 'SELECT * FROM HocSinh;',
   onAskAiTutor,
+  onBookmarkSql,
+  onSqlExecuted,
 }) => {
   const [sql, setSql] = useState<string>(initialSql);
   const [result, setResult] = useState<QueryResult | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [copied, setCopied] = useState<boolean>(false);
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<'result' | 'tables'>('result');
   const [selectedTableTab, setSelectedTableTab] = useState<string>('HocSinh');
   const [snippetCategory, setSnippetCategory] = useState<'all' | 'dml' | 'ddl' | 'dql'>('all');
@@ -67,11 +73,21 @@ export const SqlPlayground: React.FC<SqlPlaygroundProps> = ({
     setResult(res);
     setTablesTick(prev => prev + 1);
 
+    // Call execution logger for personal history tracking
+    onSqlExecuted?.(sql, res);
+
     // Save history without duplicates
     setHistory((prev) => {
       const filtered = prev.filter((item) => item !== sql);
       return [sql, ...filtered].slice(0, 10);
     });
+  };
+
+  const handleBookmarkCurrentSql = () => {
+    if (!sql.trim()) return;
+    onBookmarkSql?.(sql, `Lệnh SQL: ${sql.slice(0, 40)}...`);
+    setBookmarked(true);
+    setTimeout(() => setBookmarked(false), 2000);
   };
 
   const handleResetDb = () => {
@@ -163,6 +179,28 @@ export const SqlPlayground: React.FC<SqlPlaygroundProps> = ({
             title="Chuẩn hóa từ khóa T-SQL hoa"
           >
             Định dạng
+          </button>
+          <button
+            id="btn-bookmark-sql"
+            onClick={handleBookmarkCurrentSql}
+            className={`p-1.5 rounded-xl transition-colors border cursor-pointer flex items-center gap-1 text-xs ${
+              bookmarked
+                ? 'bg-amber-100 border-amber-300 text-amber-800 font-bold'
+                : 'text-slate-600 hover:text-amber-700 hover:bg-amber-50 border-slate-200'
+            }`}
+            title="Lưu câu lệnh này vào Bookmarks của bạn"
+          >
+            {bookmarked ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span className="hidden sm:inline text-[11px]">Đã lưu</span>
+              </>
+            ) : (
+              <>
+                <Bookmark className="w-4 h-4 text-amber-500" />
+                <span className="hidden sm:inline text-[11px]">Lưu Bookmark</span>
+              </>
+            )}
           </button>
           <button
             id="btn-copy-sql"

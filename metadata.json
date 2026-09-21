@@ -1,6 +1,6 @@
 {
   "name": "SQL Master - Học SQL Server Phổ Thông",
-  "description": "Ứng dụng học tập SQL Server tương tác dành cho học sinh phổ thông với bài học phân cấp, chạy thử SQL thời gian thực, thiết kế CSDL quan hệ và đánh giá năng lực cá nhân.",
+  "description": "Ứng dụng học tập SQL Server và CSDL quan hệ chuẩn chương trình Tin học THPT, tích hợp đăng nhập tài khoản cá nhân, lưu dấu trang (Bookmarks), nhật ký lịch sử học tập và studio ERD chuẩn hóa.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

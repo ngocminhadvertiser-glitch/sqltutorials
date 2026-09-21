@@ -166,7 +166,48 @@ export interface QueryResult {
   suggestedFix?: string;
 }
 
+export interface UserAccount {
+  id: string;
+  username: string;
+  fullName: string;
+  email: string;
+  role: 'student' | 'teacher' | 'enthusiast';
+  grade: string;
+  school?: string;
+  avatarColor?: string;
+  createdAt: string;
+}
+
+export type BookmarkType = 'lesson' | 'sql_example' | 'exercise' | 'quiz_question' | 'note' | 'sql_snippet';
+
+export interface BookmarkItem {
+  id: string;
+  type: BookmarkType;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  targetId?: string;
+  sqlSnippet?: string;
+  sqlCode?: string;
+  category?: string;
+  notes?: string;
+  createdAt: string;
+  tags?: string[];
+}
+
+export interface LearningActivityLog {
+  id: string;
+  timestamp: string;
+  type: 'lesson_completed' | 'exercise_submitted' | 'quiz_answered' | 'sql_executed';
+  title: string;
+  detail?: string;
+  status: 'success' | 'failed' | 'info';
+  pointsEarned?: number;
+  metadata?: Record<string, any>;
+}
+
 export interface StudentProgress {
+  userId?: string;
   studentName: string;
   grade: string;
   completedLessons: string[];
@@ -175,4 +216,6 @@ export interface StudentProgress {
   streakDays: number;
   totalPoints: number;
   competencyScores: Record<CompetencyCategory, number>; // 0 to 100
+  bookmarks?: BookmarkItem[];
+  activityLogs?: LearningActivityLog[];
 }

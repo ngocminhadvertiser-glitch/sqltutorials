@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { EXERCISES_DATA } from '../data/exercisesData';
-import { Exercise, DifficultyLevel } from '../types';
+import { Exercise, DifficultyLevel, BookmarkItem } from '../types';
 import { sqlEngine } from '../services/sqlEngine';
 import { 
   Award, 
@@ -14,24 +14,43 @@ import {
   Check, 
   AlertCircle,
   BookOpen,
-  CheckSquare
+  CheckSquare,
+  Bookmark
 } from 'lucide-react';
 
 interface ExercisesModuleProps {
   completedExercises: Record<string, { score: number; completedAt: string; userSql: string }>;
   onExerciseCompleted: (exerciseId: string, score: number, userSql: string, competency: Exercise['competency']) => void;
   onAskAiTutor: (sql: string, error?: string, context?: string) => void;
+  bookmarks?: BookmarkItem[];
+  onToggleBookmarkExercise?: (exercise: Exercise) => void;
+  initialSelectedExerciseId?: string;
 }
 
 export const ExercisesModule: React.FC<ExercisesModuleProps> = ({
   completedExercises,
   onExerciseCompleted,
   onAskAiTutor,
+  bookmarks = [],
+  onToggleBookmarkExercise,
+  initialSelectedExerciseId,
 }) => {
-  const [selectedExId, setSelectedExId] = useState<string>(EXERCISES_DATA[0].id);
+  const [selectedExId, setSelectedExId] = useState<string>(
+    initialSelectedExerciseId || EXERCISES_DATA[0].id
+  );
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'practice' | 'quiz'>('practice');
+
+  useEffect(() => {
+    if (initialSelectedExerciseId) {
+      setSelectedExId(initialSelectedExerciseId);
+      const targetEx = EXERCISES_DATA.find((e) => e.id === initialSelectedExerciseId);
+      if (targetEx) {
+        setCode(completedExercises[targetEx.id]?.userSql || targetEx.initialSql);
+      }
+    }
+  }, [initialSelectedExerciseId]);
 
   const currentExercise = EXERCISES_DATA.find((e) => e.id === selectedExId) || EXERCISES_DATA[0];
   const [code, setCode] = useState<string>(
@@ -258,6 +277,21 @@ export const ExercisesModule: React.FC<ExercisesModuleProps> = ({
                 Yêu cầu thực hành • CSDL {currentExercise.databaseId}
               </span>
               <div className="flex items-center gap-2">
+                {onToggleBookmarkExercise && (
+                  <button
+                    id="btn-bookmark-exercise"
+                    onClick={() => onToggleBookmarkExercise(currentExercise)}
+                    className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1 border cursor-pointer ${
+                      bookmarks.some(b => b.type === 'exercise' && b.targetId === currentExercise.id)
+                        ? 'bg-amber-100 text-amber-800 border-amber-300'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-amber-50 hover:text-amber-800'
+                    }`}
+                    title="Lưu bài tập này vào Bookmarks"
+                  >
+                    <Bookmark className={`w-3 h-3 ${bookmarks.some(b => b.type === 'exercise' && b.targetId === currentExercise.id) ? 'fill-amber-500 text-amber-500' : 'text-slate-400'}`} />
+                    <span>{bookmarks.some(b => b.type === 'exercise' && b.targetId === currentExercise.id) ? 'Đã lưu' : 'Bookmark'}</span>
+                  </button>
+                )}
                 <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
                   +{currentExercise.points} điểm rèn luyện
                 </span>

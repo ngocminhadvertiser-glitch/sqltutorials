@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CURRICULUM_LESSONS } from '../data/curriculumData';
-import { Lesson } from '../types';
+import { Lesson, BookmarkItem } from '../types';
 import { 
   BookOpen, 
   CheckCircle2, 
@@ -18,7 +18,8 @@ import {
   Layers,
   HelpCircle,
   Eye,
-  EyeOff
+  EyeOff,
+  Bookmark
 } from 'lucide-react';
 
 interface LessonViewerProps {
@@ -26,6 +27,10 @@ interface LessonViewerProps {
   onToggleCompleteLesson: (lessonId: string) => void;
   onRunSqlInPlayground: (sql: string) => void;
   onOpenErdStudio?: () => void;
+  bookmarks?: BookmarkItem[];
+  onToggleBookmarkLesson?: (lesson: Lesson) => void;
+  onBookmarkSqlExample?: (example: { title: string; sql: string; explanation: string }, lessonTitle: string) => void;
+  initialSelectedLessonId?: string;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -33,14 +38,29 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onToggleCompleteLesson,
   onRunSqlInPlayground,
   onOpenErdStudio,
+  bookmarks = [],
+  onToggleBookmarkLesson,
+  onBookmarkSqlExample,
+  initialSelectedLessonId,
 }) => {
-  const [selectedLessonId, setSelectedLessonId] = useState<string>(CURRICULUM_LESSONS[0].id);
+  const [selectedLessonId, setSelectedLessonId] = useState<string>(
+    initialSelectedLessonId || CURRICULUM_LESSONS[0].id
+  );
   const [activeNormTab, setActiveNormTab] = useState<number>(0);
   const [showAnswerKey, setShowAnswerKey] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (initialSelectedLessonId) {
+      setSelectedLessonId(initialSelectedLessonId);
+    }
+  }, [initialSelectedLessonId]);
 
   const currentLesson = CURRICULUM_LESSONS.find((l) => l.id === selectedLessonId) || CURRICULUM_LESSONS[0];
   const currentIndex = CURRICULUM_LESSONS.findIndex((l) => l.id === selectedLessonId);
   const isCompleted = completedLessons.includes(currentLesson.id);
+  const isLessonBookmarked = bookmarks.some(
+    (b) => b.type === 'lesson' && b.targetId === currentLesson.id
+  );
 
   const getLevelBadge = (level: Lesson['level']) => {
     switch (level) {
@@ -165,28 +185,47 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 </span>
               </div>
 
-              {/* Complete button */}
-              <button
-                id="btn-toggle-complete-lesson"
-                onClick={() => onToggleCompleteLesson(currentLesson.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs ${
-                  isCompleted
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                }`}
-              >
-                {isCompleted ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Đã học xong (+10 đ)</span>
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>Đánh dấu hoàn thành</span>
-                  </>
+              {/* Action buttons: Bookmark & Complete */}
+              <div className="flex items-center gap-2">
+                {onToggleBookmarkLesson && (
+                  <button
+                    id="btn-bookmark-lesson"
+                    onClick={() => onToggleBookmarkLesson(currentLesson)}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer ${
+                      isLessonBookmarked
+                        ? 'bg-amber-50 text-amber-800 border-amber-300 shadow-2xs'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-amber-50 hover:text-amber-800'
+                    }`}
+                    title={isLessonBookmarked ? 'Bỏ lưu dấu trang' : 'Lưu bài học vào Bookmarks'}
+                  >
+                    <Bookmark className={`w-4 h-4 ${isLessonBookmarked ? 'fill-amber-500 text-amber-500' : 'text-slate-400'}`} />
+                    <span>{isLessonBookmarked ? 'Đã Lưu Dấu Trang' : 'Lưu Dấu Trang'}</span>
+                  </button>
                 )}
-              </button>
+
+                {/* Complete button */}
+                <button
+                  id="btn-toggle-complete-lesson"
+                  onClick={() => onToggleCompleteLesson(currentLesson.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer ${
+                    isCompleted
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
+                >
+                  {isCompleted ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Đã học xong (+10 đ)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Đánh dấu hoàn thành</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -351,14 +390,26 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                           <span className="font-semibold text-slate-300">
                             {ex.title}
                           </span>
-                          <button
-                            id={`run-example-${exIdx}`}
-                            onClick={() => onRunSqlInPlayground(ex.sql)}
-                            className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold flex items-center gap-1 transition-all cursor-pointer"
-                          >
-                            <Play className="w-3 h-3 fill-white" />
-                            <span>Chạy thử lệnh</span>
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            {onBookmarkSqlExample && (
+                              <button
+                                onClick={() => onBookmarkSqlExample(ex, currentLesson.title)}
+                                className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg text-[11px] font-medium flex items-center gap-1 transition-all cursor-pointer border border-slate-700"
+                                title="Lưu mẫu lệnh này vào Bookmarks"
+                              >
+                                <Bookmark className="w-3 h-3" />
+                                <span className="hidden sm:inline">Lưu mẫu</span>
+                              </button>
+                            )}
+                            <button
+                              id={`run-example-${exIdx}`}
+                              onClick={() => onRunSqlInPlayground(ex.sql)}
+                              className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold flex items-center gap-1 transition-all cursor-pointer"
+                            >
+                              <Play className="w-3 h-3 fill-white" />
+                              <span>Chạy thử lệnh</span>
+                            </button>
+                          </div>
                         </div>
 
                         <pre className="p-4 font-mono text-indigo-100 overflow-x-auto selection:bg-indigo-600">
