@@ -1,242 +1,258 @@
 import { UserAccount, StudentProgress, BookmarkItem, LearningActivityLog } from '../types';
 
-const USERS_STORAGE_KEY = 'sql_master_registered_users_v2';
-const CURRENT_USER_KEY = 'sql_master_active_user_id_v2';
-const LEGACY_PROGRESS_KEY = 'sql_master_student_progress_v1';
+const SQLITE_USERS_KEY = 'sql_master_sqlite_users_v3';
+const CURRENT_USER_KEY = 'sql_master_sqlite_active_user_id_v3';
+const SQLITE_PROGRESS_PREFIX = 'sql_master_sqlite_progress_';
 
-export const DEFAULT_USERS: UserAccount[] = [
-  {
-    id: 'user-quan-1',
-    username: 'nguyenminhquan',
-    fullName: 'Nguyễn Minh Quân',
-    email: 'minhquan.thpt@gmail.com',
-    role: 'student',
-    grade: 'Lớp 11 Tin Học - THPT Chuyên',
-    avatarColor: 'from-indigo-500 to-blue-600',
-    createdAt: '2026-09-01T08:00:00.000Z',
-  },
-  {
-    id: 'user-huong-2',
-    username: 'lethihuong',
-    fullName: 'Lê Thị Hương',
-    email: 'thihuong.thpt@gmail.com',
-    role: 'student',
-    grade: 'Lớp 10A2 - THPT Ban Tự Nhiên',
-    avatarColor: 'from-emerald-500 to-teal-600',
-    createdAt: '2026-09-10T09:30:00.000Z',
-  },
-  {
-    id: 'user-thaynam-3',
-    username: 'thaynam',
-    fullName: 'Thầy Trần Văn Nam',
-    email: 'thaynam.tinhoc@edu.vn',
-    role: 'teacher',
-    grade: 'Tổ trưởng Bộ môn Tin học THPT',
-    avatarColor: 'from-amber-500 to-orange-600',
-    createdAt: '2026-08-15T10:00:00.000Z',
-  },
-];
+// Purge any legacy mock users from old local storage
+try {
+  const legacyMockKeys = [
+    'sql_master_registered_users_v2',
+    'sql_master_active_user_id_v2',
+    'sql_master_student_progress_v1',
+    'sql_master_registered_users',
+    'sql_master_active_user_id',
+  ];
+  for (const key of legacyMockKeys) {
+    if (localStorage.getItem(key)) {
+      localStorage.removeItem(key);
+    }
+  }
+} catch (e) {
+  // Ignore storage errors in non-browser environments
+}
 
 export const INITIAL_PROGRESS_TEMPLATE: StudentProgress = {
   userId: '',
   studentName: '',
   grade: '',
-  completedLessons: ['bai-1-tong-quan-csdl'],
+  completedLessons: [],
   completedExercises: {},
   quizScores: {},
   streakDays: 1,
-  totalPoints: 20,
+  totalPoints: 0,
   competencyScores: {
-    'tong-quan-csdl': 70,
-    'csdl-quan-he': 65,
-    'thiet-ke-rang-buoc': 50,
-    'truy-van-co-ban': 60,
-    'gom-nhom-thong-ke': 40,
-    'join-subquery': 30,
-    'thao-tac-du-lieu-dml': 45,
-    'dinh-nghia-du-lieu-ddl': 40,
-    'quan-tri-toan-ven': 25,
-    'du-an-tong-hop': 20,
+    'tong-quan-csdl': 0,
+    'csdl-quan-he': 0,
+    'thiet-ke-rang-buoc': 0,
+    'truy-van-co-ban': 0,
+    'gom-nhom-thong-ke': 0,
+    'join-subquery': 0,
+    'thao-tac-du-lieu-dml': 0,
+    'dinh-nghia-du-lieu-ddl': 0,
+    'quan-tri-toan-ven': 0,
+    'du-an-tong-hop': 0,
   },
-  bookmarks: [
-    {
-      id: 'bm-init-1',
-      type: 'lesson',
-      title: 'Chương 3: Phân tích và Thiết kế CSDL (ERD & 3NF)',
-      subtitle: 'Quy tắc chuẩn hóa 1NF -> 2NF -> 3NF',
-      targetId: 'bai-3-thiet-ke-csdl-erd-chuan-hoa',
-      notes: 'Phần khử phụ thuộc bắc cầu rất hay ra trong bài kiểm tra định kỳ!',
-      createdAt: '2026-09-18T14:20:00.000Z',
-      tags: ['Chuẩn hóa', 'Thiết kế ERD', 'Trọng tâm'],
-    },
-    {
-      id: 'bm-init-2',
-      type: 'sql_example',
-      title: 'Mẫu lệnh INNER JOIN nối SinhVien và Lop',
-      subtitle: 'SELECT sv.HoTen, lp.TenLop FROM SinhVien sv INNER JOIN Lop lp ON sv.MaLop = lp.MaLop',
-      targetId: 'bai-6-truy-van-nang-cao-join-subquery',
-      sqlSnippet: 'SELECT sv.MaHS, sv.HoTen, lp.TenLop FROM HocSinh sv INNER JOIN Lop lp ON sv.MaLop = lp.MaLop;',
-      notes: 'Lưu ý đặt alias ngắn gọn sv, lp để câu lệnh sáng sủa.',
-      createdAt: '2026-09-19T09:15:00.000Z',
-      tags: ['JOIN', 'Mẫu truy vấn'],
-    },
-  ],
-  activityLogs: [
-    {
-      id: 'act-init-1',
-      timestamp: '2026-09-20T10:00:00.000Z',
-      type: 'lesson_completed',
-      title: 'Hoàn thành Bài 1: Tổng quan về Cơ sở Dữ liệu',
-      detail: 'Nắm vững phân biệt Dữ liệu vs Thông tin và vai trò của DBMS.',
-      status: 'success',
-      pointsEarned: 10,
-    },
-    {
-      id: 'act-init-2',
-      timestamp: '2026-09-20T10:30:00.000Z',
-      type: 'sql_executed',
-      title: 'Thực thi câu lệnh SELECT kiểm tra danh sách học sinh',
-      detail: 'SELECT * FROM HocSinh; (Trả về 8 dòng dữ liệu thành công)',
-      status: 'success',
-    },
-  ],
+  bookmarks: [],
+  activityLogs: [],
 };
 
 class AuthService {
-  // Get all registered users
-  getUsers(): UserAccount[] {
+  private syncTimeoutMap: Map<string, any> = new Map();
+  private syncedUsers: Set<string> = new Set();
+
+  // Initialize and try to fetch registered users from SQLite server
+  async syncUsersFromSqlite(): Promise<UserAccount[]> {
     try {
-      const stored = localStorage.getItem(USERS_STORAGE_KEY);
+      const res = await fetch('/api/auth/users');
+      if (res.ok) {
+        const users = await res.json();
+        if (Array.isArray(users)) {
+          this.saveUsersToCache(users);
+          return users;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not sync users from SQLite server API:', e);
+    }
+    return this.getUsersFromCache();
+  }
+
+  // Get users from cache
+  getUsers(): UserAccount[] {
+    return this.getUsersFromCache();
+  }
+
+  private getUsersFromCache(): UserAccount[] {
+    try {
+      const stored = localStorage.getItem(SQLITE_USERS_KEY);
       if (stored) {
         return JSON.parse(stored);
       }
     } catch (e) {
-      console.warn('Failed to parse registered users, resetting to default', e);
+      console.warn('Failed to parse cached users', e);
     }
-    // Seed initial users
-    this.saveUsers(DEFAULT_USERS);
-    return DEFAULT_USERS;
+    return [];
   }
 
-  saveUsers(users: UserAccount[]): void {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  private saveUsersToCache(users: UserAccount[]): void {
+    try {
+      localStorage.setItem(SQLITE_USERS_KEY, JSON.stringify(users));
+    } catch (e) {
+      console.warn('Failed to cache users in localStorage', e);
+    }
   }
 
-  // Get current active user
-  getCurrentUser(): UserAccount {
+  // Current active user
+  getCurrentUser(): UserAccount | null {
     const users = this.getUsers();
     const activeId = localStorage.getItem(CURRENT_USER_KEY);
     if (activeId) {
       const found = users.find((u) => u.id === activeId);
       if (found) return found;
     }
-    // Default to first user
-    const defaultUser = users[0] || DEFAULT_USERS[0];
-    localStorage.setItem(CURRENT_USER_KEY, defaultUser.id);
-    return defaultUser;
+    // If there are registered users, return the first one
+    if (users.length > 0) {
+      localStorage.setItem(CURRENT_USER_KEY, users[0].id);
+      return users[0];
+    }
+    return null;
   }
 
-  // Switch/Login to user
+  // Switch to another registered user
   switchUser(userId: string): UserAccount {
     const users = this.getUsers();
     const target = users.find((u) => u.id === userId);
     if (!target) {
-      throw new Error('Người dùng không tồn tại.');
+      throw new Error('Người dùng không tồn tại trong SQLite Database.');
     }
     localStorage.setItem(CURRENT_USER_KEY, target.id);
     return target;
   }
 
-  // Login with username/email & password
-  login(credential: string, _password?: string): UserAccount {
-    const users = this.getUsers();
-    const clean = credential.trim().toLowerCase();
-    const found = users.find(
-      (u) => u.username.toLowerCase() === clean || u.email.toLowerCase() === clean
-    );
-    if (!found) {
-      throw new Error('Tài khoản hoặc Email không tồn tại trong hệ thống.');
-    }
-    localStorage.setItem(CURRENT_USER_KEY, found.id);
-    return found;
+  // Logout current user
+  logout(): void {
+    localStorage.removeItem(CURRENT_USER_KEY);
   }
 
-  // Register new account
-  register(data: {
+  // Login with username/email & password against SQLite backend
+  async login(credential: string, password?: string): Promise<{ user: UserAccount; progress: StudentProgress }> {
+    const clean = credential.trim().toLowerCase();
+    
+    // First attempt SQLite server API login
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: clean, password }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Đăng nhập không thành công.');
+      }
+      
+      const user: UserAccount = data.user;
+      const progress: StudentProgress = data.progress;
+
+      // Update local cache
+      const currentUsers = this.getUsers().filter((u) => u.id !== user.id);
+      this.saveUsersToCache([user, ...currentUsers]);
+      localStorage.setItem(CURRENT_USER_KEY, user.id);
+      this.saveUserProgressToCache(user.id, progress);
+
+      return { user, progress };
+    } catch (apiErr: any) {
+      // If network fails, check cached users as fallback
+      const cachedUsers = this.getUsers();
+      const found = cachedUsers.find(
+        (u) => u.username.toLowerCase() === clean || u.email.toLowerCase() === clean
+      );
+      if (found) {
+        localStorage.setItem(CURRENT_USER_KEY, found.id);
+        const progress = this.getUserProgress(found.id);
+        return { user: found, progress };
+      }
+      throw new Error(apiErr.message || 'Không tìm thấy tài khoản trong SQLite Database.');
+    }
+  }
+
+  // Register new account into SQLite backend
+  async register(data: {
     username: string;
+    password?: string;
     fullName: string;
     email: string;
-    role: 'student' | 'teacher' | 'enthusiast';
-    grade: string;
-  }): UserAccount {
-    const users = this.getUsers();
+    role?: 'student' | 'teacher' | 'enthusiast';
+    grade?: string;
+    school?: string;
+  }): Promise<{ user: UserAccount; progress: StudentProgress }> {
     const cleanUsername = data.username.trim().toLowerCase();
     const cleanEmail = data.email.trim().toLowerCase();
 
-    if (users.some((u) => u.username.toLowerCase() === cleanUsername)) {
-      throw new Error('Tên đăng nhập này đã có người sử dụng. Vui lòng chọn tên khác.');
+    if (!cleanUsername || cleanUsername.length < 3) {
+      throw new Error('Tên đăng nhập phải có ít nhất 3 ký tự.');
     }
-    if (users.some((u) => u.email.toLowerCase() === cleanEmail)) {
-      throw new Error('Email này đã được đăng ký trong hệ thống.');
+    if (!data.fullName.trim()) {
+      throw new Error('Vui lòng nhập Họ và Tên của bạn.');
+    }
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      throw new Error('Vui lòng nhập định dạng Email hợp lệ.');
     }
 
-    const colors = [
-      'from-blue-600 to-indigo-600',
-      'from-emerald-500 to-teal-700',
-      'from-purple-600 to-pink-600',
-      'from-amber-500 to-rose-600',
-      'from-cyan-600 to-blue-700',
-    ];
-    const randomColor = colors[users.length % colors.length];
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: cleanUsername,
+          password: data.password || '123456',
+          fullName: data.fullName.trim(),
+          email: cleanEmail,
+          role: data.role || 'student',
+          grade: data.grade?.trim() || 'Lớp 11 Tin Học - THPT',
+          school: data.school?.trim() || 'Trường THPT',
+        }),
+      });
 
-    const newUser: UserAccount = {
-      id: `user-${Date.now()}`,
-      username: cleanUsername,
-      fullName: data.fullName.trim(),
-      email: cleanEmail,
-      role: data.role,
-      grade: data.grade.trim() || 'Học sinh Tin học',
-      avatarColor: randomColor,
-      createdAt: new Date().toISOString(),
-    };
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Đăng ký vào SQLite Database thất bại.');
+      }
 
-    const updated = [...users, newUser];
-    this.saveUsers(updated);
-    localStorage.setItem(CURRENT_USER_KEY, newUser.id);
+      const user: UserAccount = json.user;
+      const progress: StudentProgress = json.progress;
 
-    // Initialize blank progress for new user
-    const initialProgress: StudentProgress = {
-      ...INITIAL_PROGRESS_TEMPLATE,
-      userId: newUser.id,
-      studentName: newUser.fullName,
-      grade: newUser.grade,
-      completedLessons: [],
-      completedExercises: {},
-      quizScores: {},
-      streakDays: 1,
-      totalPoints: 0,
-      bookmarks: [],
-      activityLogs: [
-        {
-          id: `act-${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          type: 'lesson_completed',
-          title: 'Chào mừng gia nhập SQL Master!',
-          detail: 'Tài khoản đã được khởi tạo thành công. Hãy bắt đầu từ Chương 1!',
-          status: 'info',
-        },
-      ],
-    };
-    this.saveUserProgress(newUser.id, initialProgress);
+      // Update local storage cache
+      const currentUsers = this.getUsers().filter((u) => u.id !== user.id);
+      this.saveUsersToCache([user, ...currentUsers]);
+      localStorage.setItem(CURRENT_USER_KEY, user.id);
+      this.saveUserProgressToCache(user.id, progress);
 
-    return newUser;
+      return { user, progress };
+    } catch (err: any) {
+      throw new Error(err.message || 'Lỗi khi kết nối với SQLite Database.');
+    }
   }
 
-  // Load progress for a specific user
+  // Load progress for user
   getUserProgress(userId: string): StudentProgress {
-    const userKey = `sql_master_progress_${userId}`;
+    const cached = this.getUserProgressFromCache(userId);
+    if (cached) {
+      // Async refresh from SQLite server only once per session
+      if (!this.syncedUsers.has(userId) && userId !== 'guest_session') {
+        this.syncedUsers.add(userId);
+        this.fetchProgressFromSqlite(userId).catch(() => {});
+      }
+      return cached;
+    }
+
+    // Default template if brand new
+    const initial: StudentProgress = {
+      ...INITIAL_PROGRESS_TEMPLATE,
+      userId,
+      studentName: 'Học sinh',
+      grade: 'Lớp 11 Tin Học - THPT',
+    };
+    this.saveUserProgressToCache(userId, initial);
+    if (userId !== 'guest_session') {
+      this.fetchProgressFromSqlite(userId).catch(() => {});
+    }
+    return initial;
+  }
+
+  private getUserProgressFromCache(userId: string): StudentProgress | null {
     try {
-      const saved = localStorage.getItem(userKey);
+      const saved = localStorage.getItem(`${SQLITE_PROGRESS_PREFIX}${userId}`);
       if (saved) {
         const parsed: StudentProgress = JSON.parse(saved);
         return {
@@ -247,49 +263,58 @@ class AuthService {
           activityLogs: parsed.activityLogs || [],
         };
       }
+    } catch (e) {
+      console.warn(`Failed to read progress cache for ${userId}`, e);
+    }
+    return null;
+  }
 
-      // Check legacy progress for first default user
-      if (userId === 'user-quan-1') {
-        const legacy = localStorage.getItem(LEGACY_PROGRESS_KEY);
-        if (legacy) {
-          const parsedLegacy = JSON.parse(legacy);
-          const merged: StudentProgress = {
-            ...INITIAL_PROGRESS_TEMPLATE,
-            ...parsedLegacy,
-            userId,
-            bookmarks: parsedLegacy.bookmarks || INITIAL_PROGRESS_TEMPLATE.bookmarks,
-            activityLogs: parsedLegacy.activityLogs || INITIAL_PROGRESS_TEMPLATE.activityLogs,
-          };
-          this.saveUserProgress(userId, merged);
-          return merged;
+  private saveUserProgressToCache(userId: string, progress: StudentProgress): void {
+    try {
+      localStorage.setItem(`${SQLITE_PROGRESS_PREFIX}${userId}`, JSON.stringify(progress));
+    } catch (e) {
+      console.warn('Failed to cache progress to localStorage', e);
+    }
+  }
+
+  async fetchProgressFromSqlite(userId: string): Promise<StudentProgress | null> {
+    try {
+      const res = await fetch(`/api/progress/${userId}`);
+      if (res.ok) {
+        const prog = await res.json();
+        if (prog && prog.userId) {
+          this.saveUserProgressToCache(userId, prog);
+          return prog;
         }
       }
     } catch (e) {
-      console.warn(`Failed to read progress for user ${userId}`, e);
+      // Ignore background fetch failures
     }
-
-    // Default template for user
-    const user = this.getUsers().find((u) => u.id === userId);
-    const initial: StudentProgress = {
-      ...INITIAL_PROGRESS_TEMPLATE,
-      userId,
-      studentName: user?.fullName || 'Học sinh',
-      grade: user?.grade || 'Tin học THPT',
-    };
-    this.saveUserProgress(userId, initial);
-    return initial;
+    return null;
   }
 
-  // Save progress for a specific user
+  // Save progress: update cache immediately & debounced push to SQLite server
   saveUserProgress(userId: string, progress: StudentProgress): void {
-    const userKey = `sql_master_progress_${userId}`;
-    const cleanProgress: StudentProgress = {
-      ...progress,
-      userId,
-      bookmarks: progress.bookmarks || [],
-      activityLogs: progress.activityLogs || [],
-    };
-    localStorage.setItem(userKey, JSON.stringify(cleanProgress));
+    this.saveUserProgressToCache(userId, progress);
+
+    // Debounced sync to SQLite backend
+    if (this.syncTimeoutMap.has(userId)) {
+      clearTimeout(this.syncTimeoutMap.get(userId));
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        await fetch(`/api/progress/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(progress),
+        });
+      } catch (err) {
+        console.warn('Failed to push progress to SQLite backend', err);
+      }
+    }, 400);
+
+    this.syncTimeoutMap.set(userId, timer);
   }
 
   // Bookmarks helper
@@ -301,10 +326,11 @@ class AuthService {
       createdAt: new Date().toISOString(),
     };
     const updatedBookmarks = [newBookmark, ...(progress.bookmarks || [])];
-    this.saveUserProgress(userId, {
+    const nextProg: StudentProgress = {
       ...progress,
       bookmarks: updatedBookmarks,
-    });
+    };
+    this.saveUserProgress(userId, nextProg);
     return newBookmark;
   }
 
@@ -336,7 +362,6 @@ class AuthService {
       id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       timestamp: new Date().toISOString(),
     };
-    // Keep last 100 logs
     const updatedLogs = [newLog, ...(progress.activityLogs || [])].slice(0, 100);
     this.saveUserProgress(userId, {
       ...progress,
@@ -351,51 +376,65 @@ class AuthService {
       activityLogs: [],
     });
   }
+
+  // SQLite Database status fetcher
+  async getDatabaseStats(): Promise<{
+    engine: string;
+    dbPath: string;
+    fileSizeBytes: number;
+    userCount: number;
+    progressCount: number;
+    lastPersisted: string;
+  } | null> {
+    try {
+      const res = await fetch('/api/sqlite/stats');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.warn('Could not fetch SQLite stats', e);
+    }
+    return null;
+  }
 }
 
 export const authService = new AuthService();
 
-// Convenience top-level exports for direct consumption across the app
-export const getCurrentUser = (): UserAccount => authService.getCurrentUser();
+// Convenience top-level exports
+export const getCurrentUser = (): UserAccount | null => authService.getCurrentUser();
 export const getAllAccounts = (): UserAccount[] => authService.getUsers();
 
-export const loginUser = (idOrUsername: string, password?: string): { success: boolean; user?: UserAccount; error?: string } => {
+export const loginUser = async (
+  idOrUsername: string,
+  password?: string
+): Promise<{ success: boolean; user?: UserAccount; progress?: StudentProgress; error?: string }> => {
   try {
-    const user = authService.login(idOrUsername, password);
-    return { success: true, user };
+    const { user, progress } = await authService.login(idOrUsername, password);
+    return { success: true, user, progress };
   } catch (err: any) {
     return { success: false, error: err.message || 'Đăng nhập không thành công' };
   }
 };
 
-export const registerUser = (data: {
+export const registerUser = async (data: {
   username: string;
   fullName: string;
-  email?: string;
+  email: string;
+  password?: string;
   role?: 'student' | 'teacher' | 'enthusiast';
   grade?: string;
   school?: string;
-  password?: string;
-}): { success: boolean; user?: UserAccount; error?: string } => {
+}): Promise<{ success: boolean; user?: UserAccount; progress?: StudentProgress; error?: string }> => {
   try {
-    const user = authService.register({
-      username: data.username,
-      fullName: data.fullName,
-      email: data.email || `${data.username}@thpt.edu.vn`,
-      role: data.role || 'student',
-      grade: data.grade || 'Lớp 11 Tin Học - THPT',
-    });
-    return { success: true, user };
+    const { user, progress } = await authService.register(data);
+    return { success: true, user, progress };
   } catch (err: any) {
     return { success: false, error: err.message || 'Đăng ký không thành công' };
   }
 };
 
 export const logoutUser = (): void => {
-  const users = authService.getUsers();
-  if (users.length > 0) {
-    authService.switchUser(users[0].id);
-  }
+  authService.logout();
 };
 
 export const getUserProgress = (userId: string): StudentProgress => authService.getUserProgress(userId);
@@ -423,3 +462,5 @@ export const addActivityLogToUser = (userId: string, log: Omit<LearningActivityL
 export const clearUserActivityLogs = (userId: string): void => {
   authService.clearActivityLogs(userId);
 };
+
+export const fetchSqliteStats = () => authService.getDatabaseStats();

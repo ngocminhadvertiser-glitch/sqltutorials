@@ -47,9 +47,11 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<UserAccount>(() => getCurrentUser());
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => getCurrentUser());
   const [accounts, setAccounts] = useState<UserAccount[]>(() => getAllAccounts());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
+  const effectiveUserId = currentUser ? currentUser.id : 'guest_session';
 
   const [activeTab, setActiveTab] = useState<string>('lessons');
   const [currentDbId, setCurrentDbId] = useState<string>('QuanLyHocSinh');
@@ -73,27 +75,27 @@ export default function App() {
     contextTitle: undefined,
   });
 
-  // Current user's learning progress and activity history
-  const [progress, setProgress] = useState<StudentProgress>(() => getUserProgress(currentUser.id));
+  // Current user's learning progress and activity history from SQLite
+  const [progress, setProgress] = useState<StudentProgress>(() => getUserProgress(effectiveUserId));
 
   // When user switches or registers, sync progress to state
   useEffect(() => {
-    const userProg = getUserProgress(currentUser.id);
+    const userProg = getUserProgress(effectiveUserId);
     setProgress(userProg);
-  }, [currentUser.id]);
+  }, [effectiveUserId]);
 
-  // Persist progress to local user storage
+  // Persist progress to local user storage & SQLite
   const updateProgress = (updater: (prev: StudentProgress) => StudentProgress) => {
     setProgress((prev) => {
       const next = updater(prev);
-      saveUserProgress(currentUser.id, next);
+      saveUserProgress(effectiveUserId, next);
       return next;
     });
   };
 
   // Switch / Login user
-  const handleLogin = (identifier: string, password?: string) => {
-    const res = loginUser(identifier, password);
+  const handleLogin = async (identifier: string, password?: string) => {
+    const res = await loginUser(identifier, password);
     if (res.success && res.user) {
       setCurrentUser(res.user);
       setAccounts(getAllAccounts());
@@ -105,8 +107,8 @@ export default function App() {
   };
 
   // Register user
-  const handleRegister = (data: { username: string; fullName: string; grade?: string; school?: string; password?: string }) => {
-    const res = registerUser(data);
+  const handleRegister = async (data: { username: string; fullName: string; email: string; grade?: string; school?: string; password?: string }) => {
+    const res = await registerUser(data);
     if (res.success && res.user) {
       setCurrentUser(res.user);
       setAccounts(getAllAccounts());
@@ -119,9 +121,8 @@ export default function App() {
 
   const handleLogout = () => {
     logoutUser();
-    const guest = getCurrentUser();
-    setCurrentUser(guest);
-    setProgress(getUserProgress(guest.id));
+    setCurrentUser(null);
+    setProgress(getUserProgress('guest_session'));
   };
 
   // Toggle completion of a lesson
@@ -136,7 +137,7 @@ export default function App() {
 
       // Log activity if completed
       if (!isDone) {
-        addActivityLogToUser(currentUser.id, {
+        addActivityLogToUser(effectiveUserId, {
           type: 'lesson_completed',
           title: `Hoàn thành bài học: ${lessonId}`,
           detail: 'Đã hoàn thành phần lý thuyết & câu hỏi trắc nghiệm kiểm tra.',
@@ -168,7 +169,7 @@ export default function App() {
       const alreadyDone = !!prev.completedExercises[exerciseId];
       const newScore = prev.totalPoints + (alreadyDone ? 0 : score);
 
-      addActivityLogToUser(currentUser.id, {
+      addActivityLogToUser(effectiveUserId, {
         type: 'exercise_submitted',
         title: `Nộp bài tập: ${exerciseId}`,
         detail: `Lệnh SQL: ${userSql.slice(0, 100)}`,
@@ -207,7 +208,7 @@ export default function App() {
       const alreadyAnswered = !!prev.quizScores[quizId];
       const pointsDiff = isCorrect && !alreadyAnswered ? 5 : 0;
 
-      addActivityLogToUser(currentUser.id, {
+      addActivityLogToUser(effectiveUserId, {
         type: 'quiz_answered',
         title: `Trả lời câu hỏi trắc nghiệm: ${quizId}`,
         detail: `Đáp án chọn: ${selectedOption} (${isCorrect ? 'Chính xác' : 'Chưa đúng'})`,
@@ -235,7 +236,7 @@ export default function App() {
 
   // Log SQL execution in history
   const handleLogSqlExecution = (sql: string, result: QueryResult) => {
-    addActivityLogToUser(currentUser.id, {
+    addActivityLogToUser(effectiveUserId, {
       type: 'sql_executed',
       title: result.success ? 'Thực thi SQL thành công' : 'Lỗi thực thi SQL',
       detail: sql,
@@ -247,7 +248,7 @@ export default function App() {
       },
     });
     // refresh progress
-    setProgress(getUserProgress(currentUser.id));
+    setProgress(getUserProgress(effectiveUserId));
   };
 
   // Bookmark handlers
@@ -256,9 +257,9 @@ export default function App() {
       (b) => b.type === 'lesson' && b.targetId === lesson.id
     );
     if (existing) {
-      removeBookmarkFromUser(currentUser.id, existing.id);
+      removeBookmarkFromUser(effectiveUserId, existing.id);
     } else {
-      addBookmarkToUser(currentUser.id, {
+      addBookmarkToUser(effectiveUserId, {
         type: 'lesson',
         title: lesson.title,
         description: lesson.description,
@@ -267,7 +268,7 @@ export default function App() {
         tags: [lesson.level, 'Lý thuyết'],
       });
     }
-    setProgress(getUserProgress(currentUser.id));
+    setProgress(getUserProgress(effectiveUserId));
   };
 
   const handleToggleBookmarkExercise = (exercise: Exercise) => {
@@ -275,9 +276,9 @@ export default function App() {
       (b) => b.type === 'exercise' && b.targetId === exercise.id
     );
     if (existing) {
-      removeBookmarkFromUser(currentUser.id, existing.id);
+      removeBookmarkFromUser(effectiveUserId, existing.id);
     } else {
-      addBookmarkToUser(currentUser.id, {
+      addBookmarkToUser(effectiveUserId, {
         type: 'exercise',
         title: exercise.title,
         description: exercise.description,
@@ -286,11 +287,11 @@ export default function App() {
         tags: [exercise.level, exercise.category || 'Truy vấn'],
       });
     }
-    setProgress(getUserProgress(currentUser.id));
+    setProgress(getUserProgress(effectiveUserId));
   };
 
   const handleBookmarkSqlSnippet = (sql: string, note?: string) => {
-    addBookmarkToUser(currentUser.id, {
+    addBookmarkToUser(effectiveUserId, {
       type: 'sql_snippet',
       title: note || `Lệnh SQL ${new Date().toLocaleTimeString()}`,
       sqlCode: sql,
@@ -298,14 +299,14 @@ export default function App() {
       category: `CSDL ${currentDbId}`,
       tags: ['T-SQL', currentDbId],
     });
-    setProgress(getUserProgress(currentUser.id));
+    setProgress(getUserProgress(effectiveUserId));
   };
 
   const handleBookmarkSqlExampleFromLesson = (
     example: { title: string; sql: string; explanation: string },
     lessonTitle: string
   ) => {
-    addBookmarkToUser(currentUser.id, {
+    addBookmarkToUser(effectiveUserId, {
       type: 'sql_snippet',
       title: example.title,
       sqlCode: example.sql,
@@ -313,18 +314,18 @@ export default function App() {
       category: lessonTitle,
       tags: ['Mẫu lệnh', 'Lý thuyết'],
     });
-    setProgress(getUserProgress(currentUser.id));
+    setProgress(getUserProgress(effectiveUserId));
   };
 
   const handleRemoveBookmark = (bookmarkId: string) => {
-    removeBookmarkFromUser(currentUser.id, bookmarkId);
-    setProgress(getUserProgress(currentUser.id));
+    removeBookmarkFromUser(effectiveUserId, bookmarkId);
+    setProgress(getUserProgress(effectiveUserId));
   };
 
   const handleClearHistory = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử hoạt động cá nhân?')) {
-      clearUserActivityLogs(currentUser.id);
-      setProgress(getUserProgress(currentUser.id));
+      clearUserActivityLogs(effectiveUserId);
+      setProgress(getUserProgress(effectiveUserId));
     }
   };
 
@@ -469,12 +470,12 @@ export default function App() {
           bookmarks={progress.bookmarks || []}
           onRemoveBookmark={handleRemoveBookmark}
           onAddBookmark={(item) => {
-            addBookmarkToUser(currentUser.id, item);
-            setProgress(getUserProgress(currentUser.id));
+            addBookmarkToUser(effectiveUserId, item);
+            setProgress(getUserProgress(effectiveUserId));
           }}
           onUpdateBookmarkNotes={(bookmarkId: string, notes: string) => {
-            updateUserBookmarkNotes(currentUser.id, bookmarkId, notes);
-            setProgress(getUserProgress(currentUser.id));
+            updateUserBookmarkNotes(effectiveUserId, bookmarkId, notes);
+            setProgress(getUserProgress(effectiveUserId));
           }}
           onGoToLesson={(lessonId: string) => {
             setTargetLessonId(lessonId);
@@ -526,11 +527,21 @@ export default function App() {
       {/* Account Info Pill Banner on top */}
       <div className="bg-indigo-900 text-indigo-100 text-xs py-1.5 px-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Học sinh: <strong className="text-white">{currentUser.fullName}</strong> ({currentUser.grade || 'Lớp 11 Tin học'})</span>
-            <span className="text-indigo-300">• {currentUser.school || 'Trường THPT Chuyên'}</span>
-          </div>
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Học sinh: <strong className="text-white">{currentUser.fullName}</strong> ({currentUser.grade || 'Lớp 11 Tin học'})</span>
+              <span className="text-indigo-300">• {currentUser.school || 'Trường THPT'}</span>
+              <span className="hidden sm:inline-block ml-1.5 px-2 py-0.5 rounded bg-indigo-800 text-[10px] text-emerald-300 border border-indigo-700 font-mono">
+                SQLite 3 Active
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>Chế độ Khách • Hãy tạo tài khoản để lưu trữ tiến trình học tập an toàn vào <strong>SQLite Database</strong></span>
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             <button
@@ -551,7 +562,7 @@ export default function App() {
               onClick={() => setIsAuthModalOpen(true)}
               className="bg-indigo-700/80 hover:bg-indigo-600 text-white font-bold px-2.5 py-0.5 rounded-lg text-[11px] transition-all cursor-pointer"
             >
-              Đổi tài khoản
+              {currentUser ? 'Quản lý tài khoản' : 'Đăng ký / Đăng nhập'}
             </button>
           </div>
         </div>
@@ -599,7 +610,8 @@ export default function App() {
         onUserChanged={(newUser) => {
           setCurrentUser(newUser);
           setAccounts(getAllAccounts());
-          setProgress(getUserProgress(newUser.id));
+          const targetId = newUser ? newUser.id : 'guest_session';
+          setProgress(getUserProgress(targetId));
         }}
       />
 

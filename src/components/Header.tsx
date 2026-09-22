@@ -10,7 +10,7 @@ interface HeaderProps {
   setIsMobileDeviceFrame: (val: boolean) => void;
   currentDbId: string;
   setCurrentDbId: (dbId: string) => void;
-  currentUser?: UserAccount;
+  currentUser?: UserAccount | null;
   onOpenAuthModal?: () => void;
 }
 
@@ -178,27 +178,39 @@ export const Header: React.FC<HeaderProps> = ({
               <span>{progress.totalPoints}đ</span>
             </div>
 
-            {/* User Account / Profile Button */}
-            {currentUser && onOpenAuthModal && (
-              <button
-                id="btn-user-profile"
-                onClick={onOpenAuthModal}
-                className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 bg-white hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
-                title="Quản lý tài khoản & Đổi hồ sơ học sinh"
-              >
-                <div className={`w-7 h-7 rounded-lg bg-gradient-to-tr ${currentUser.avatarColor || 'from-indigo-500 to-blue-600'} text-white font-black text-xs flex items-center justify-center shadow-xs`}>
-                  {currentUser.fullName.charAt(0)}
-                </div>
-                <div className="text-left hidden lg:block">
-                  <div className="text-xs font-bold text-slate-800 leading-tight truncate max-w-[110px]">
-                    {currentUser.fullName}
+            {/* User Account / Profile Button or Login/Register */}
+            {onOpenAuthModal && (
+              currentUser ? (
+                <button
+                  id="btn-user-profile"
+                  onClick={onOpenAuthModal}
+                  className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 bg-white hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
+                  title="Tài khoản cá nhân & SQLite Database"
+                >
+                  <div className={`w-7 h-7 rounded-lg bg-gradient-to-tr ${currentUser.avatarColor || 'from-indigo-500 to-blue-600'} text-white font-black text-xs flex items-center justify-center shadow-xs`}>
+                    {currentUser.fullName.charAt(0)}
                   </div>
-                  <div className="text-[10px] text-slate-400 font-mono leading-none">
-                    @{currentUser.username}
+                  <div className="text-left hidden lg:block">
+                    <div className="text-xs font-bold text-slate-800 leading-tight truncate max-w-[110px]">
+                      {currentUser.fullName}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-mono leading-none">
+                      @{currentUser.username}
+                    </div>
                   </div>
-                </div>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
-              </button>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
+              ) : (
+                <button
+                  id="btn-login-register"
+                  onClick={onOpenAuthModal}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                  title="Đăng nhập hoặc Đăng ký tài khoản mới"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>Đăng ký / Đăng nhập</span>
+                </button>
+              )
             )}
 
             {/* Mobile View Toggle */}

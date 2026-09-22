@@ -4,6 +4,14 @@ import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import {
+  sqliteRegisterUser,
+  sqliteLoginUser,
+  sqliteGetUsers,
+  sqliteGetProgress,
+  sqliteSaveProgress,
+  sqliteGetDatabaseStats,
+} from "./server/sqliteDb.js";
 
 dotenv.config();
 
@@ -19,6 +27,85 @@ async function startServer() {
   // Health check
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // SQLite Database status & stats
+  app.get("/api/sqlite/stats", async (_req, res) => {
+    try {
+      const stats = await sqliteGetDatabaseStats();
+      res.json(stats);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // SQLite Auth: Get all registered users (excluding password hashes)
+  app.get("/api/auth/users", async (_req, res) => {
+    try {
+      const users = await sqliteGetUsers();
+      res.json(users);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // SQLite Auth: Register new user
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, password, fullName, email, role, grade, school } = req.body;
+      if (!username || !fullName || !email) {
+        return res.status(400).json({ error: "Vui lòng cung cấp đầy đủ họ tên, tên đăng nhập và email." });
+      }
+      const user = await sqliteRegisterUser({
+        username,
+        password,
+        fullName,
+        email,
+        role,
+        grade,
+        school,
+      });
+      const progress = await sqliteGetProgress(user.id);
+      res.status(201).json({ success: true, user, progress });
+    } catch (err: any) {
+      res.status(400).json({ success: false, error: err.message || "Đăng ký không thành công." });
+    }
+  });
+
+  // SQLite Auth: Login user
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { credential, password } = req.body;
+      if (!credential) {
+        return res.status(400).json({ error: "Vui lòng nhập tên đăng nhập hoặc email." });
+      }
+      const { user, progress } = await sqliteLoginUser(credential, password);
+      res.json({ success: true, user, progress });
+    } catch (err: any) {
+      res.status(401).json({ success: false, error: err.message || "Đăng nhập không thành công." });
+    }
+  });
+
+  // SQLite Progress: Get user progress
+  app.get("/api/progress/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const progress = await sqliteGetProgress(userId);
+      res.json(progress);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // SQLite Progress: Save / update user progress
+  app.post("/api/progress/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const saved = await sqliteSaveProgress(userId, req.body);
+      res.json({ success: true, progress: saved });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   });
 
   // AI Tutor endpoint for SQL error explanation & hints
