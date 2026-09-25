@@ -8,114 +8,118 @@ export const CURRICULUM_LESSONS: Lesson[] = [
   {
     id: 'bai-1-tong-quan-csdl',
     chapterId: 'chuong-1',
-    chapterTitle: 'Chương 1: Tổng quan về Cơ sở Dữ liệu',
-    title: 'Bài 1: Khái niệm CSDL, Hệ Quản trị CSDL (DBMS) & Các Mô hình Dữ liệu',
-    description: 'Nắm vững khái niệm dữ liệu, thông tin, cơ sở dữ liệu, vai trò của DBMS trong hệ thống thông tin và phân biệt CSDL quan hệ với các mô hình khác.',
+    chapterTitle: 'Chương 1: Tổng quan về cơ sở dữ liệu',
+    title: 'Bài 1: Khái niệm cơ sở dữ liệu và hệ quản trị cơ sở dữ liệu',
+    description: 'Khám phá dữ liệu, thông tin, cơ sở dữ liệu và hệ quản trị cơ sở dữ liệu qua các ví dụ quen thuộc ở trường học dành cho học sinh cấp 2 và cấp 3.',
     level: 'co-ban',
     competency: 'tong-quan-csdl',
-    estimatedMinutes: 30,
+    estimatedMinutes: 25,
     prerequisites: [
-      'Tin học đại cương hoặc kỹ năng sử dụng máy tính căn bản',
-      'Khái niệm cơ bản về lưu trữ tệp tin (File)'
+      'Kỹ năng sử dụng máy tính cơ bản',
+      'Đã từng làm quen với bảng tính hoặc tệp văn bản'
     ],
     learningObjectives: [
-      'Trình bày chính xác khái niệm dữ liệu (Data), thông tin (Information) và cơ sở dữ liệu (Database).',
-      'Phân biệt rõ ràng giữa Cơ sở dữ liệu và Hệ quản trị cơ sở dữ liệu (DBMS).',
-      'Giải thích vai trò của DBMS trong hệ thống thông tin quản lý của doanh nghiệp và trường học.',
-      'Phân biệt CSDL quan hệ (RDBMS) với các mô hình khác (phân cấp, mạng, NoSQL).',
-      'Nắm được tổng quan về ngôn ngữ SQL và các hệ quản trị phổ biến như SQL Server, MySQL, PostgreSQL.'
+      'Phân biệt được dữ liệu và thông tin qua các ví dụ thực tế trong học tập.',
+      'Hiểu được cơ sở dữ liệu là gì và vì sao cần lưu trữ dữ liệu bằng cơ sở dữ liệu.',
+      'Biết được vai trò của hệ quản trị cơ sở dữ liệu (DBMS) trong việc quản lý và bảo vệ dữ liệu.',
+      'Làm quen với ngôn ngữ SQL và câu lệnh SELECT cơ bản để xem dữ liệu.'
     ],
     relatedTable: 'HocSinh',
     suggestedPracticeSql: "SELECT MaHS, HoTen, GioiTinh, NgaySinh, DiaChi FROM HocSinh;",
     mermaidDiagram: `graph TD
-      A[Thế giới thực: Đào tạo Cao đẳng] -->|Thu thập| B[Dữ liệu thô: 10, 'Nam', 2008-03-15]
-      B -->|Xử lý & Có ngữ cảnh| C[Thông tin: Học sinh Nguyễn Quốc Anh, Điểm 10 Tin học]
-      C -->|Tổ chức có cấu trúc| D[Cơ sở Dữ liệu Database]
-      D <-->|Quản lý & Bảo vệ| E[Hệ Quản trị CSDL DBMS: SQL Server]
-      E <-->|Giao tiếp qua SQL| F[Người dùng / Ứng dụng Quản lý Đào tạo]`,
+      A[Thế giới thực: Đời sống học đường] -->|Thu thập| B[Dữ liệu thô: 10, Nam, 2010-05-15]
+      B -->|Đặt vào ngữ cảnh| C[Thông tin: Học sinh Quốc Anh đạt điểm 10 môn Tin học]
+      C -->|Lưu trữ có sắp xếp| D[Cơ sở dữ liệu Database]
+      D <-->|Quản lý và bảo vệ| E[Hệ quản trị CSDL: SQL Server]
+      E <-->|Giao tiếp bằng lệnh SQL| F[Thầy cô, học sinh và sổ liên lạc điện tử]`,
     commonMistakes: [
       {
-        mistake: 'Nhầm lẫn Cơ sở Dữ liệu (Database) là phần mềm SQL Server.',
-        correction: 'CSDL là kho dữ liệu được lưu trữ. SQL Server là Hệ Quản trị CSDL (phần mềm công cụ) dùng để tạo, quản lý và bảo vệ kho dữ liệu đó.',
-        why: 'Giống như nhà kho (Database) và người thủ kho thông minh (DBMS).'
+        mistake: 'Nghĩ rằng cơ sở dữ liệu và phần mềm SQL Server là một.',
+        correction: 'Cơ sở dữ liệu là kho lưu trữ dữ liệu, còn SQL Server là phần mềm giúp quản lý kho dữ liệu đó.',
+        why: 'Tương tự như kho sách thư viện (cơ sở dữ liệu) và cô thủ thư phụ trách quản lý (hệ quản trị cơ sở dữ liệu).'
       },
       {
-        mistake: 'Nghĩ rằng dùng bảng tính Excel là đủ cho mọi hệ thống thông tin.',
-        correction: 'Excel chỉ phù hợp cho cá nhân hoặc dữ liệu nhỏ. Với hàng nghìn sinh viên và nhiều người cùng sửa đổi, Excel dễ bị xung đột, trùng lặp và không có bảo mật phân quyền.',
-        why: 'Excel thiếu cơ chế kiểm soát đồng thời (Concurrency Control) và toàn vẹn dữ liệu tự động.'
+        mistake: 'Cho rằng chỉ cần dùng bảng tính Excel là đủ cho mọi trường học.',
+        correction: 'Excel phù hợp cho cá nhân lưu danh sách nhỏ. Khi hàng nghìn học sinh cùng tra cứu điểm thi một lúc, cơ sở dữ liệu mới đảm bảo an toàn và không bị nghẽn.',
+        why: 'Cơ sở dữ liệu có khả năng bảo mật, phân quyền và phục vụ nhiều người dùng cùng một lúc.'
       }
     ],
     sections: [
       {
         id: 'sec-1-1',
-        title: '1. Dữ liệu, Thông tin và Cơ sở Dữ liệu (Data vs. Information vs. Database)',
-        content: `Trong kỷ nguyên số, dữ liệu được coi là tài sản quý giá nhất của mỗi tổ chức:
-- **Dữ liệu (Data):** Là các sự kiện thô chưa qua xử lý (ví dụ: chuỗi ký tự "HS001", số 9.5, ngày "2008-03-15").
-- **Thông tin (Information):** Là dữ liệu đã được gán ngữ cảnh và xử lý có ý nghĩa (ví dụ: "Học sinh Nguyễn Quốc Anh đạt điểm 9.5 môn Tin học kỳ 1").
-- **Cơ sở Dữ liệu (Database - CSDL):** Là một tập hợp dữ liệu có cấu trúc, có liên quan logic với nhau, được lưu trữ an toàn trên thiết bị nhớ của máy tính nhằm phục vụ nhiều người dùng và nhiều ứng dụng đồng thời.
+        title: '1. Dữ liệu, thông tin và cơ sở dữ liệu là gì?',
+        content: `Trong thời đại công nghệ số, dữ liệu và thông tin xuất hiện ở khắp mọi nơi xung quanh chúng ta:
 
-*Tại sao cần Cơ sở Dữ liệu thay cho lưu trữ file văn bản / bảng tính?*
-1. **Tránh dư thừa dữ liệu (Data Redundancy):** Không phải gõ lại thông tin sinh viên ở mọi file điểm.
-2. **Đảm bảo tính nhất quán (Consistency):** Khi học sinh đổi số điện thoại, chỉ cần cập nhật tại 1 nơi duy nhất.
-3. **Bảo mật và Phân quyền (Security & Authorization):** Giảng viên chỉ được nhập điểm môn mình dạy; sinh viên chỉ được xem điểm của mình.
-4. **Kiểm soát truy cập đồng thời (Concurrency Control):** Hàng nghìn người có thể đăng ký môn học cùng một giây mà không ghi đè mất dữ liệu.`,
+- Dữ liệu (Data): Là các con số, chữ cái, ký hiệu thô chưa qua xử lý. Ví dụ: chuỗi ký tự "HS001", số 9.5, chữ "Nam". Nếu chỉ nhìn riêng lẻ từng dữ liệu này, chúng ta chưa thể hiểu được ý nghĩa cụ thể của nó.
+
+- Thông tin (Information): Là dữ liệu đã được đặt vào ngữ cảnh rõ ràng và mang lại ý nghĩa cho người đọc. Ví dụ: "Học sinh có mã HS001 là bạn Nguyễn Quốc Anh, đạt 9.5 điểm môn Tin học kỳ 1".
+
+- Cơ sở dữ liệu (Database - CSDL): Là một kho lưu trữ dữ liệu được sắp xếp có tổ chức trên máy tính, giúp chúng ta tìm kiếm, thêm mới và quản lý một cách nhanh chóng và an toàn.
+
+Ví dụ gần gũi: Hệ thống sổ điểm điện tử của nhà trường, ứng dụng tra cứu điểm thi vào lớp 10, hay danh mục sách trong thư viện trường học đều là các cơ sở dữ liệu quen thuộc.`,
         keyTakeaways: [
-          'Dữ liệu + Ngữ cảnh = Thông tin hữu ích.',
-          'CSDL giải quyết triệt để các nhược điểm: dư thừa, không nhất quán, mất an toàn của file rời rạc.'
+          'Dữ liệu khi đặt vào ngữ cảnh sẽ tạo thành thông tin hữu ích.',
+          'Cơ sở dữ liệu là kho chứa dữ liệu có cấu trúc trên máy tính giúp tra cứu nhanh chóng.'
         ],
-        teacherNote: 'Thầy nhấn mạnh: Các em cần phân biệt rõ Dữ liệu thô và Thông tin. Trong bài thi tốt nghiệp hoặc phỏng vấn, câu hỏi phân biệt này rất hay xuất hiện!'
+        teacherNote: 'Thầy lưu ý: Các em cần nhớ sự khác nhau giữa dữ liệu và thông tin. Dữ liệu giống như những viên gạch thô, còn thông tin là ngôi nhà hoàn thiện có ý nghĩa!'
       },
       {
         id: 'sec-1-2',
-        title: '2. Hệ Quản trị Cơ sở Dữ liệu (DBMS) & Vai trò trong Hệ thống Thông tin',
-        content: `**Hệ Quản trị Cơ sở Dữ liệu (Database Management System - DBMS)** là phần mềm chuyên dụng cung cấp môi trường để:
-1. **Định nghĩa dữ liệu (DDL):** Tạo cấu trúc bảng, kiểu dữ liệu, các ràng buộc.
-2. **Thao tác dữ liệu (DML):** Thêm mới, chỉnh sửa, xóa và truy vấn dữ liệu.
-3. **Bảo vệ và Quản trị:** Kiểm soát quyền truy cập, sao lưu phục hồi (Backup & Restore), quản lý giao dịch an toàn (Transaction).
+        title: '2. Vì sao trường học cần cơ sở dữ liệu thay vì file bảng tính?',
+        content: `Nhiều bạn học sinh thường thắc mắc: "Thầy cô vẫn dùng bảng tính Excel để ghi điểm, vậy tại sao lại cần đến cơ sở dữ liệu?"
 
-*Các hệ quản trị CSDL quan hệ phổ biến hiện nay:*
-- **Microsoft SQL Server:** Hệ quản trị mạnh mẽ của Microsoft, chuẩn công nghiệp cho doanh nghiệp và trường học, hỗ trợ ngôn ngữ T-SQL.
-- **MySQL / MariaDB:** Hệ quản trị mã nguồn mở phổ biến nhất trên môi trường Web (PHP, Node.js).
-- **PostgreSQL:** Hệ quản trị CSDL quan hệ đối tượng tiên tiến, độ tuân thủ chuẩn SQL rất cao.
-- **Oracle Database:** Dành cho các hệ thống tài chính ngân hàng quy mô cực lớn.`,
-        sqlExamples: [
-          {
-            title: 'Truy vấn thông tin cơ bản từ SQL Server',
-            description: 'Dùng lệnh SELECT để xem dữ liệu học sinh/sinh viên',
-            sql: "SELECT MaHS, HoTen, GioiTinh, NgaySinh, DiaChi FROM HocSinh;",
-            explanation: 'DBMS nhận câu lệnh SQL, tối ưu hóa đường dẫn truy xuất (Query Optimizer) và trả về bảng kết quả mà không làm biến đổi dữ liệu lưu trữ.',
-            expectedResult: 'Danh sách các dòng học sinh gồm mã, họ tên, giới tính, ngày sinh và địa chỉ.'
-          }
-        ],
+File bảng tính Excel rất tiện lợi cho một người làm việc với lượng dữ liệu nhỏ, nhưng khi một trường học có hàng nghìn học sinh, Excel bộc lộ nhiều điểm hạn chế:
+
+1. Tránh trùng lặp và dư thừa dữ liệu: Trong cơ sở dữ liệu, thông tin của mỗi học sinh chỉ cần lưu đúng một lần duy nhất. Thầy cô không phải nhập lại tên, ngày sinh của học sinh ở từng môn học.
+
+2. Cập nhật dữ liệu nhất quán: Khi một bạn đổi số điện thoại của phụ huynh, thầy cô chỉ cần sửa tại một nơi duy nhất. Toàn bộ các sổ điểm và sổ liên lạc sẽ tự động cập nhật đồng bộ.
+
+3. Bảo mật và phân quyền rõ ràng: Giáo viên bộ môn nào chỉ được nhập điểm môn đó, còn học sinh chỉ được xem điểm của mình mà không thể tự ý sửa điểm hay xem thông tin cá nhân của bạn khác.
+
+4. Hỗ trợ hàng nghìn người truy cập cùng lúc: Vào ngày công bố điểm thi, hàng nghìn phụ huynh và học sinh có thể vào tra cứu điểm cùng một giây mà hệ thống vẫn chạy ổn định.`,
         keyTakeaways: [
-          'Người dùng không thao tác trực tiếp với file vật lý mà luôn giao tiếp thông qua DBMS.',
-          'SQL là ngôn ngữ chuẩn quốc tế để giao tiếp với mọi hệ quản trị CSDL quan hệ.'
+          'Cơ sở dữ liệu giúp tránh trùng lặp dữ liệu và tự động đồng bộ thông tin.',
+          'Cơ sở dữ liệu có tính bảo mật cao, phân quyền truy cập và phục vụ nhiều người dùng cùng lúc.'
         ]
       },
       {
         id: 'sec-1-3',
-        title: '3. Các Mô hình Cơ sở Dữ liệu: Từ Phân cấp, Mạng đến Quan hệ và NoSQL',
-        content: `Lịch sử phát triển của công nghệ cơ sở dữ liệu đã trải qua nhiều giai đoạn:
-1. **Mô hình Phân cấp (Hierarchical Model - thập niên 1960):** Dữ liệu tổ chức theo dạng cây (Tree) hình cha - con (1 Cha có nhiều Con, mỗi Con chỉ có 1 Cha). Nhược điểm: Rất khó biểu diễn quan hệ Nhiều - Nhiều.
-2. **Mô hình Mạng (Network Model):** Dữ liệu tổ chức dạng đồ thị (Graph), 1 con có thể có nhiều cha. Nhược điểm: Cấu trúc con trỏ phức tạp, khó bảo trì khi CSDL phình to.
-3. **Mô hình Quan hệ (Relational Model - Đề xuất bởi Edgar F. Codd, 1970):** Dữ liệu được tổ chức dưới dạng các bảng 2 chiều gồm dòng và cột. Đây là mô hình chuẩn mực thống trị toàn cầu hơn 50 năm qua nhờ tính đơn giản, toán học chặt chẽ (đại số quan hệ) và ngôn ngữ truy vấn SQL mạnh mẽ.
-4. **Mô hình NoSQL (Not Only SQL - Thập niên 2000 đến nay):** Lưu trữ phi quan hệ (Document JSON như MongoDB, Key-Value như Redis, Column-family như Cassandra). Phù hợp cho dữ liệu phi cấu trúc, mạng xã hội và phân tán cực lớn.`,
+        title: '3. Hệ quản trị cơ sở dữ liệu và ngôn ngữ SQL',
+        content: `Để quản lý và tương tác với kho dữ liệu trên máy tính, chúng ta cần một phần mềm đặc biệt gọi là Hệ quản trị cơ sở dữ liệu:
+
+- Hệ quản trị cơ sở dữ liệu (DBMS): Là phần mềm giúp chúng ta tạo lập, lưu trữ, tìm kiếm và bảo vệ cơ sở dữ liệu. Em có thể hình dung cơ sở dữ liệu là kho sách lớn, còn hệ quản trị cơ sở dữ liệu chính là người thủ thư thông minh giúp tìm và giữ gìn các cuốn sách.
+
+- Các hệ quản trị cơ sở dữ liệu phổ biến:
+  + Microsoft SQL Server: Hệ quản trị rất phổ biến trong các trường học và doanh nghiệp.
+  + MySQL: Hệ quản trị mã nguồn mở được dùng rộng rãi trên các trang web học tập và mạng xã hội.
+  + PostgreSQL và SQLite: Các hệ quản trị gọn nhẹ, chạy nhanh và an toàn.
+
+- Ngôn ngữ SQL (Structured Query Language): Là ngôn ngữ chuẩn quốc tế giúp con người "nói chuyện" với hệ quản trị cơ sở dữ liệu. Chỉ cần viết một câu lệnh ngắn gọn bằng tiếng Anh đơn giản (như SELECT), máy tính sẽ lập tức tìm và hiển thị đúng thông tin em cần!`,
+        sqlExamples: [
+          {
+            title: 'Xem danh sách học sinh bằng câu lệnh SELECT',
+            description: 'Dùng lệnh SELECT để xem dữ liệu học sinh',
+            sql: "SELECT MaHS, HoTen, GioiTinh, NgaySinh, DiaChi FROM HocSinh;",
+            explanation: 'Hệ quản trị cơ sở dữ liệu nhận câu lệnh SQL, tìm kiếm dữ liệu và hiển thị bảng thông tin học sinh ra màn hình.',
+            expectedResult: 'Danh sách các dòng học sinh gồm mã, họ tên, giới tính, ngày sinh và địa chỉ.'
+          }
+        ],
         keyTakeaways: [
-          'Mô hình CSDL quan hệ (RDBMS) là nền tảng cốt lõi của mọi lập trình viên và chuyên viên dữ liệu.',
-          'NoSQL bổ trợ cho RDBMS ở các bài toán dữ liệu lớn và tốc độ đọc ghi phi cấu trúc.'
+          'Hệ quản trị cơ sở dữ liệu (DBMS) là phần mềm trung gian giúp quản lý và bảo vệ dữ liệu.',
+          'SQL là ngôn ngữ chuẩn quốc tế đơn giản để giao tiếp với hệ quản trị cơ sở dữ liệu.'
         ]
       }
     ],
     practiceLevels: {
-      level1: 'Trình bày sự khác biệt giữa Data và Information. Kể tên 3 hệ quản trị CSDL quan hệ phổ biến.',
-      level2: 'Phân tích vì sao một trường cao đẳng có 5.000 sinh viên không nên dùng sổ tay Excel để quản lý đăng ký môn học.',
-      level3: 'So sánh ưu và nhược điểm giữa Mô hình CSDL Quan hệ (SQL Server) và Mô hình Lưu trữ Tài liệu NoSQL (MongoDB).'
+      level1: 'Em hãy nêu một ví dụ về dữ liệu và một ví dụ về thông tin trong lớp học của em.',
+      level2: 'Tại sao khi nhà trường tổ chức tra cứu điểm thi tuyển sinh cho hàng nghìn học sinh, thầy cô lại dùng cơ sở dữ liệu thay vì mở một tệp Excel?',
+      level3: 'Kể tên một hệ quản trị cơ sở dữ liệu phổ biến mà em biết và cho biết ngôn ngữ nào được dùng để giao tiếp với nó.'
     },
     endOfLessonReview: {
-      summaryQuestion: 'Tại sao DBMS lại là thành phần trung tâm không thể thiếu trong mọi hệ thống thông tin hiện đại?',
+      summaryQuestion: 'Cơ sở dữ liệu và hệ quản trị cơ sở dữ liệu khác nhau ở điểm nào?',
       sqlChallenge: "SELECT MaHS, HoTen, DiaChi FROM HocSinh WHERE DiaChi = N'Hà Nội';",
-      scenarioQuestion: 'Giả sử một bệnh viện quản lý bệnh án bằng các file Word lưu trên máy tính bác sĩ. Hãy chỉ ra 3 nguy cơ lớn nhất và đề xuất giải pháp.',
-      teacherAnswerKey: '3 nguy cơ: (1) Mất dữ liệu khi ổ cứng hỏng do không có cơ chế backup tập trung; (2) Không thể tra cứu tiền sử bệnh nhân khi chuyển khoa; (3) Vi phạm bảo mật bí mật bệnh án. Giải pháp: Xây dựng CSDL quan hệ trên SQL Server có phân quyền bác sĩ/y tá.'
+      scenarioQuestion: 'Một trường học lưu điểm của học sinh trên các file Word rải rác ở máy tính từng giáo viên. Hãy chỉ ra 2 rủi ro lớn nhất và nêu cách khắc phục.',
+      teacherAnswerKey: '2 rủi ro: dễ bị mất dữ liệu khi máy tính hỏng và khó tổng hợp điểm toàn trường. Khắc phục: lưu tập trung vào một cơ sở dữ liệu có phân quyền an toàn.'
     }
   },
 
