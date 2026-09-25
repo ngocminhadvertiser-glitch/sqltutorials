@@ -179,15 +179,15 @@ File bảng tính Excel rất tiện lợi cho một người làm việc với 
       {
         id: 'sec-2-1-bang-cot-dong',
         title: '1. Cấu trúc Bảng dữ liệu: Bảng, Cột và Dòng như Sổ điểm lớp',
-        content: `Trong tin học, Cơ sở dữ liệu quan hệ tổ chức dữ liệu thành các **Bảng (Table)** rất giống với cuốn sổ điểm danh của thầy cô giáo:
+        content: `Trong tin học, Cơ sở dữ liệu quan hệ tổ chức dữ liệu thành các Bảng (Table) rất giống với cuốn sổ điểm danh của thầy cô giáo:
 
-- **Bảng (Table):** Là một tập hợp dữ liệu về một đối tượng cụ thể (ví dụ: Bảng [HocSinh], Bảng [LopHoc], Bảng [MonHoc]).
-- **Cột (Column / Thuộc tính):** Đại diện cho một mục thông tin cần quản lý. Mỗi cột có tên riêng và một kiểu dữ liệu quy định:
+- Bảng (Table): Là một tập hợp dữ liệu về một đối tượng cụ thể (ví dụ: Bảng [HocSinh], Bảng [LopHoc], Bảng [MonHoc]).
+- Cột (Column / Thuộc tính): Đại diện cho một mục thông tin cần quản lý. Mỗi cột có tên riêng và một kiểu dữ liệu quy định:
   + Cột \`MaHS\`: Chứa chuỗi ký tự mã học sinh (như 'HS001').
   + Cột \`HoTen\`: Chứa họ và tên học sinh.
   + Cột \`NgaySinh\`: Chứa ngày tháng năm sinh.
-- **Dòng (Row / Bản ghi):** Đại diện cho thông tin đầy đủ của **MỘT** đối tượng cụ thể. Ví dụ: một dòng lưu đầy đủ thông tin của bạn "Nguyễn Quốc Anh, Nam, sinh ngày 2011-03-15".
-- **Ô dữ liệu (Cell):** Điểm giao nhau giữa dòng và cột, chứa một giá trị duy nhất (đơn trị).
+- Dòng (Row / Bản ghi): Đại diện cho thông tin đầy đủ của MỘT đối tượng cụ thể. Ví dụ: một dòng lưu đầy đủ thông tin của bạn "Nguyễn Quốc Anh, Nam, sinh ngày 2011-03-15".
+- Ô dữ liệu (Cell): Điểm giao nhau giữa dòng và cột, chứa một giá trị duy nhất (đơn trị).
 
 *Ưu điểm lớn nhất:* Dữ liệu được sắp xếp ngay ngắn theo hàng theo lối, giúp máy tính có thể tìm kiếm, sắp xếp và tính điểm chỉ trong 1 phần nghìn giây!`,
         keyTakeaways: [
@@ -199,18 +199,18 @@ File bảng tính Excel rất tiện lợi cho một người làm việc với 
       {
         id: 'sec-2-2-khoa-chinh',
         title: '2. Khóa chính (Primary Key - PK): Chiếc "Thẻ Học Sinh" độc nhất vô nhị',
-        content: `**Tình huống thực tế:**
+        content: `Tình huống thực tế:
 Trong một trường học có 1.000 học sinh, có đến 3 bạn đều tên là "Nguyễn Văn Nam". Khi thầy cô nhập điểm 10 vào máy tính, làm sao phần mềm biết điểm 10 đó là của bạn Nam lớp 8A hay bạn Nam lớp 8C?
--> **Giải pháp:** Nhà trường cấp cho mỗi bạn một **Mã học sinh (MaHS)** riêng biệt in trên Thẻ học sinh (ví dụ: HS001, HS002, HS003).
+-> Giải pháp: Nhà trường cấp cho mỗi bạn một Mã học sinh (MaHS) riêng biệt in trên Thẻ học sinh (ví dụ: HS001, HS002, HS003).
 
-Trong CSDL, cột chứa mã định danh đó được gọi là **Khóa chính (PRIMARY KEY - viết tắt là PK)**.
+Trong CSDL, cột chứa mã định danh đó được gọi là Khóa chính (PRIMARY KEY - viết tắt là PK).
 
-**2 QUY TẮC VÀNG CỦA KHÓA CHÍNH (Học sinh cấp 2 cần ghi nhớ):**
-1. **Tính Duy Nhất (Unique):** Giá trị khóa chính ở mỗi dòng không bao giờ được phép trùng nhau.
-2. **Không được để trống (NOT NULL):** Bất cứ bạn học sinh nào đã được lưu vào bảng thì BẮT BUỘC phải có mã số, không được để trống ô này.
+2 QUY TẮC VÀNG CỦA KHÓA CHÍNH (Học sinh cấp 2 cần ghi nhớ):
+1. Tính Duy Nhất (Unique): Giá trị khóa chính ở mỗi dòng không bao giờ được phép trùng nhau.
+2. Không được để trống (NOT NULL): Bất cứ bạn học sinh nào đã được lưu vào bảng thì BẮT BUỘC phải có mã số, không được để trống ô này.
 
 *Lưu ý sư phạm quan trọng:*
-Ở bậc THCS, các em **hoàn toàn không cần học** các định nghĩa phức tạp như *Siêu khóa (Superkey)* hay *Khóa ứng viên (Candidate Key)*. Chỉ cần nắm vững Khóa chính là chiếc chìa khóa định danh duy nhất cho từng dòng dữ liệu!`,
+Ở bậc THCS, các em hoàn toàn không cần học các định nghĩa phức tạp như *Siêu khóa (Superkey)* hay *Khóa ứng viên (Candidate Key)*. Chỉ cần nắm vững Khóa chính là chiếc chìa khóa định danh duy nhất cho từng dòng dữ liệu!`,
         sqlExamples: [
           {
             title: 'Khai báo Khóa chính khi tạo Bảng Học sinh',
@@ -236,9 +236,9 @@ Trong CSDL, cột chứa mã định danh đó được gọi là **Khóa chính
         content: `Rất nhiều bạn học sinh khi mới học CSDL thường thắc mắc: *"Tại sao không lấy luôn Tên bạn đó làm khóa chính cho dễ nhớ?"*
 
 Hãy xem điều gì sẽ xảy ra:
-1. **Họ tên rất dễ trùng nhau:** Nếu trường có 2 bạn tên "Trần Mai Linh", khi bạn thứ hai nhập học, máy tính sẽ báo lỗi: *"Violation of PRIMARY KEY"* và từ chối lưu bạn thứ hai!
-2. **Họ tên và Số điện thoại có thể thay đổi:** Học sinh có thể đổi số điện thoại của bố mẹ, hoặc đổi sang số mới. Khóa chính thì nên ổn định suốt quá trình học tập.
-3. **Mã số ngắn gọn, tra cứu siêu tốc:** Mã \`HS001\` ngắn hơn rất nhiều so với chuỗi \`Nguyễn Hoàng Khánh Chi\`, giúp máy tính tìm kiếm nhanh gấp hàng chục lần.
+1. Họ tên rất dễ trùng nhau: Nếu trường có 2 bạn tên "Trần Mai Linh", khi bạn thứ hai nhập học, máy tính sẽ báo lỗi: *"Violation of PRIMARY KEY"* và từ chối lưu bạn thứ hai!
+2. Họ tên và Số điện thoại có thể thay đổi: Học sinh có thể đổi số điện thoại của bố mẹ, hoặc đổi sang số mới. Khóa chính thì nên ổn định suốt quá trình học tập.
+3. Mã số ngắn gọn, tra cứu siêu tốc: Mã \`HS001\` ngắn hơn rất nhiều so với chuỗi \`Nguyễn Hoàng Khánh Chi\`, giúp máy tính tìm kiếm nhanh gấp hàng chục lần.
 
 *Các ví dụ Khóa chính quen thuộc xung quanh chúng ta:*
 - Mã học sinh (\`MaHS\`) trên thẻ học sinh.
@@ -313,21 +313,21 @@ Hãy xem điều gì sẽ xảy ra:
       {
         id: 'sec-2-2-1-tai-sao-can-nhieu-bang',
         title: '1. Tại sao cần nhiều Bảng và cần "Chiếc cầu nối"?',
-        content: `Hãy tưởng tượng nếu nhà trường lưu toàn bộ dữ liệu vào **MỘT BẢNG DUY NHẤT**:
+        content: `Hãy tưởng tượng nếu nhà trường lưu toàn bộ dữ liệu vào MỘT BẢNG DUY NHẤT:
 | MaHS | HoTen | MaLop | TenLop | PhongHoc | GVCN | MonHoc | DiemThi |
 |---|---|---|---|---|---|---|---|
 | HS001 | Nguyễn Quốc Anh | 8A | Lớp 8A | P.201 | Cô Mai | Tin học | 9.5 |
 | HS002 | Trần Mai Linh | 8A | Lớp 8A | P.201 | Cô Mai | Tin học | 9.0 |
 
-**Hậu quả tai hại:**
+Hậu quả tai hại:
 - Tên lớp "Lớp 8A", phòng "P.201", giáo viên "Cô Mai" bị gõ lặp đi lặp lại hàng trăm lần.
 - Rất dễ gõ sai chính tả (bạn thì gõ "Lớp 8A", bạn thì gõ "lop 8a").
 - Khi cô Mai chuyển công tác, người quản trị phải tìm và sửa hàng trăm dòng!
 
-**Giải pháp thông minh của Cơ sở Dữ liệu Quan hệ:**
+Giải pháp thông minh của Cơ sở Dữ liệu Quan hệ:
 Chia làm 2 bảng chuyên biệt:
-1. **Bảng [LopHoc] (Bảng Cha):** Chỉ lưu danh sách các lớp. Mỗi lớp lưu đúng 1 dòng duy nhất (\`MaLop\`, \`TenLop\`, \`GVCN\`).
-2. **Bảng [HocSinh] (Bảng Con):** Mỗi bạn học sinh chỉ cần ghi ngắn gọn mã lớp của mình (\`MaLop = '8A'\`).`,
+1. Bảng [LopHoc] (Bảng Cha): Chỉ lưu danh sách các lớp. Mỗi lớp lưu đúng 1 dòng duy nhất (\`MaLop\`, \`TenLop\`, \`GVCN\`).
+2. Bảng [HocSinh] (Bảng Con): Mỗi bạn học sinh chỉ cần ghi ngắn gọn mã lớp của mình (\`MaLop = '8A'\`).`,
         keyTakeaways: [
           'Tách bảng giúp tránh dư thừa dữ liệu và tránh sai sót khi cập nhật thông tin.',
           'Khóa ngoại đóng vai trò chiếc cầu nối giữa 2 bảng.'
@@ -336,12 +336,12 @@ Chia làm 2 bảng chuyên biệt:
       {
         id: 'sec-2-2-2-khoa-ngoai-la-gi',
         title: '2. Khóa ngoại (Foreign Key - FK) là gì?',
-        content: `**Khóa ngoại (FOREIGN KEY - viết tắt là FK)** là một cột trong bảng này dùng để tham chiếu (trỏ) sang cột **Khóa chính** của một bảng khác.
+        content: `Khóa ngoại (FOREIGN KEY - viết tắt là FK) là một cột trong bảng này dùng để tham chiếu (trỏ) sang cột Khóa chính của một bảng khác.
 
-- **Bảng Cha (Parent Table):** Bảng chứa Khóa chính được tham chiếu đến (ví dụ: Bảng \`LopHoc\` với khóa chính \`MaLop\`).
-- **Bảng Con (Child Table):** Bảng chứa Khóa ngoại tham chiếu sang bảng cha (ví dụ: Bảng \`HocSinh\` với cột khóa ngoại \`MaLop\`).
+- Bảng Cha (Parent Table): Bảng chứa Khóa chính được tham chiếu đến (ví dụ: Bảng \`LopHoc\` với khóa chính \`MaLop\`).
+- Bảng Con (Child Table): Bảng chứa Khóa ngoại tham chiếu sang bảng cha (ví dụ: Bảng \`HocSinh\` với cột khóa ngoại \`MaLop\`).
 
-**Ý nghĩa bảo vệ kỳ diệu của Khóa ngoại:**
+Ý nghĩa bảo vệ kỳ diệu của Khóa ngoại:
 Nếu một bạn học sinh mới chuyển đến và nhân viên vô tình gõ mã lớp là \`8Z\` (trong khi trường chỉ có lớp 8A, 8B, 8C), hệ thống SQL sẽ ngay lập tức "tu còi" chặn lại:
 > *"Lỗi: Không tìm thấy lớp học 8Z trong bảng LopHoc!"*
 
@@ -368,11 +368,11 @@ Nhờ có Khóa ngoại, không bao giờ xảy ra trường hợp một bạn h
       {
         id: 'sec-2-2-3-moi-quan-he-1-n',
         title: '3. Mối quan hệ Một - Nhiều (1-N) và Ghép Bảng đơn giản',
-        content: `Mối quan hệ phổ biến nhất giữa các bảng trong trường học là **Quan hệ Một - Nhiều (1-N)**:
-- **1 Lớp học** có thể chứa **Nhiều học sinh** (Ví dụ: Lớp 8A có 40 bạn).
-- Nhưng **mỗi học sinh** chỉ thuộc về **1 Lớp học** duy nhất tại một thời điểm.
+        content: `Mối quan hệ phổ biến nhất giữa các bảng trong trường học là Quan hệ Một - Nhiều (1-N):
+- 1 Lớp học có thể chứa Nhiều học sinh (Ví dụ: Lớp 8A có 40 bạn).
+- Nhưng mỗi học sinh chỉ thuộc về 1 Lớp học duy nhất tại một thời điểm.
 
-**Làm sao để xem danh sách học sinh kèm tên lớp?**
+Làm sao để xem danh sách học sinh kèm tên lớp?
 Nhờ có Khóa ngoại, chúng ta dùng từ khóa \`JOIN\` trong SQL để ghép 2 bảng lại với nhau:
 
 \`\`\`sql
@@ -570,10 +570,10 @@ Kết quả trả về sẽ hiển thị đầy đủ tên học sinh, cùng v�
         id: 'sec-3-1',
         title: '1. Quy trình Phân tích Nghiệp vụ & Xác định Thực thể - Thuộc tính',
         content: `Mọi dự án phần mềm cơ sở dữ liệu đều bắt đầu bằng bước phân tích yêu cầu nghiệp vụ:
-- **Bước 1: Khảo sát thực tế:** Gặp gỡ người dùng (cán bộ đào tạo, giảng viên, sinh viên), thu thập các biểu mẫu giấy tờ (Phiếu báo điểm, Đơn xin nhập học, Thời khóa biểu).
-- **Bước 2: Xác định Thực thể (Entities):** Tìm kiếm các danh từ chỉ đối tượng có thông tin cần quản lý độc lập (ví dụ: SinhVien, LopHoc, MonHoc, GiangVien).
-- **Bước 3: Xác định Thuộc tính (Attributes):** Tìm các đặc trưng của từng thực thể (ví dụ: Sinh viên có MaSV, HoTen, NgaySinh, QueQuan).
-- **Bước 4: Xác định Mối quan hệ (Relationships):** Xem xét hành vi động giữa các thực thể (Sinh viên *thuộc về* Lớp học; Sinh viên *đăng ký* Môn học; Giảng viên *chủ nhiệm* Lớp học).`,
+- Bước 1: Khảo sát thực tế: Gặp gỡ người dùng (cán bộ đào tạo, giảng viên, sinh viên), thu thập các biểu mẫu giấy tờ (Phiếu báo điểm, Đơn xin nhập học, Thời khóa biểu).
+- Bước 2: Xác định Thực thể (Entities): Tìm kiếm các danh từ chỉ đối tượng có thông tin cần quản lý độc lập (ví dụ: SinhVien, LopHoc, MonHoc, GiangVien).
+- Bước 3: Xác định Thuộc tính (Attributes): Tìm các đặc trưng của từng thực thể (ví dụ: Sinh viên có MaSV, HoTen, NgaySinh, QueQuan).
+- Bước 4: Xác định Mối quan hệ (Relationships): Xem xét hành vi động giữa các thực thể (Sinh viên *thuộc về* Lớp học; Sinh viên *đăng ký* Môn học; Giảng viên *chủ nhiệm* Lớp học).`,
         keyTakeaways: [
           'Thực thể thường là Danh từ; Mối quan hệ thường là Động từ trong bản mô tả nghiệp vụ.',
           'Thuộc tính phải gắn liền với thực thể tương ứng, không được gán nhầm sang thực thể khác.'
@@ -582,16 +582,16 @@ Kết quả trả về sẽ hiển thị đầy đủ tên học sinh, cùng v�
       {
         id: 'sec-3-2',
         title: '2. Xây dựng Sơ đồ ERD & Quy tắc Chuyển đổi sang Mô hình Quan hệ',
-        content: `**Sơ đồ Thực thể - Liên kết (Entity-Relationship Diagram - ERD)** là công cụ trực quan biểu diễn mô hình dữ liệu ở mức quan niệm (Conceptual Level):
+        content: `Sơ đồ Thực thể - Liên kết (Entity-Relationship Diagram - ERD) là công cụ trực quan biểu diễn mô hình dữ liệu ở mức quan niệm (Conceptual Level):
 - Thực thể được biểu diễn bằng hình chữ nhật.
 - Thuộc tính được biểu diễn bằng hình elip (hoặc danh sách bên trong hộp chữ nhật).
 - Mối quan hệ được biểu diễn bằng hình thoi hoặc các đường nối có ký hiệu bản số (Cardinality: 1-1, 1-N, N-N).
 
 *4 Quy tắc vàng chuyển đổi ERD sang Bảng quan hệ:*
-1. **Thực thể -> Bảng:** Mỗi thực thể chuyển thành một bảng; thuộc tính khóa trở thành Khóa chính (PK).
-2. **Quan hệ 1 - N:** Lấy Khóa chính của bên 1 đưa sang làm Khóa ngoại (FK) ở bên N. *(Ví dụ: Đưa MaLop từ LopHoc sang bảng SinhVien)*.
-3. **Quan hệ N - N:** Tạo một **bảng liên kết trung gian mới**, Khóa chính của bảng này là tổ hợp các Khóa chính của 2 bảng tham gia. *(Ví dụ: Bảng KetQua có PK là MaSV + MaMH)*.
-4. **Quan hệ 1 - 1:** Có thể gộp chung thành 1 bảng, hoặc lấy PK của bảng này làm FK của bảng kia và gán thêm ràng buộc UNIQUE.`,
+1. Thực thể -> Bảng: Mỗi thực thể chuyển thành một bảng; thuộc tính khóa trở thành Khóa chính (PK).
+2. Quan hệ 1 - N: Lấy Khóa chính của bên 1 đưa sang làm Khóa ngoại (FK) ở bên N. *(Ví dụ: Đưa MaLop từ LopHoc sang bảng SinhVien)*.
+3. Quan hệ N - N: Tạo một bảng liên kết trung gian mới, Khóa chính của bảng này là tổ hợp các Khóa chính của 2 bảng tham gia. *(Ví dụ: Bảng KetQua có PK là MaSV + MaMH)*.
+4. Quan hệ 1 - 1: Có thể gộp chung thành 1 bảng, hoặc lấy PK của bảng này làm FK của bảng kia và gán thêm ràng buộc UNIQUE.`,
         keyTakeaways: [
           'Quy tắc chuyển đổi chuyển hóa ý tưởng logic thành cấu trúc vật lý sẵn sàng cho SQL.',
           'Quan hệ N-N luôn sinh ra bảng trung gian.'
@@ -600,15 +600,15 @@ Kết quả trả về sẽ hiển thị đầy đủ tên học sinh, cùng v�
       {
         id: 'sec-3-3',
         title: '3. Chuẩn hóa Dữ liệu: 1NF, 2NF, 3NF & Loại bỏ Dị thường (Anomalies)',
-        content: `Nếu CSDL thiết kế tồi, hệ thống sẽ gặp 3 loại **Dị thường (Anomalies)** vô cùng nguy hiểm:
-1. **Dị thường Thêm (Insertion Anomaly):** Không thể thêm một Môn học mới nếu chưa có sinh viên nào đăng ký môn đó.
-2. **Dị thường Xóa (Deletion Anomaly):** Khi xóa sinh viên duy nhất của một lớp, thông tin về lớp học và phòng học đó cũng bị xóa sạch theo!
-3. **Dị thường Cập nhật (Update Anomaly):** Muốn đổi tên giáo viên chủ nhiệm, phải tìm và sửa hàng trăm dòng sinh viên trong lớp, nếu sót một dòng sẽ dẫn đến dữ liệu mâu thuẫn bất nhất.
+        content: `Nếu CSDL thiết kế tồi, hệ thống sẽ gặp 3 loại Dị thường (Anomalies) vô cùng nguy hiểm:
+1. Dị thường Thêm (Insertion Anomaly): Không thể thêm một Môn học mới nếu chưa có sinh viên nào đăng ký môn đó.
+2. Dị thường Xóa (Deletion Anomaly): Khi xóa sinh viên duy nhất của một lớp, thông tin về lớp học và phòng học đó cũng bị xóa sạch theo!
+3. Dị thường Cập nhật (Update Anomaly): Muốn đổi tên giáo viên chủ nhiệm, phải tìm và sửa hàng trăm dòng sinh viên trong lớp, nếu sót một dòng sẽ dẫn đến dữ liệu mâu thuẫn bất nhất.
 
 *3 Dạng chuẩn hóa kinh điển:*
-- **1NF (First Normal Form):** Mỗi thuộc tính chỉ chứa giá trị nguyên tử (Atomic), không có cột đa trị (Multi-valued) hay nhóm lặp (Repeating groups).
-- **2NF (Second Normal Form):** Đạt 1NF VÀ không có phụ thuộc hàm bộ phận vào khóa chính hợp thành (Mọi thuộc tính không khóa phải phụ thuộc vào toàn bộ PK).
-- **3NF (Third Normal Form):** Đạt 2NF VÀ không có phụ thuộc bắc cầu (Thuộc tính không khóa không được phụ thuộc vào một thuộc tính không khóa khác).`,
+- 1NF (First Normal Form): Mỗi thuộc tính chỉ chứa giá trị nguyên tử (Atomic), không có cột đa trị (Multi-valued) hay nhóm lặp (Repeating groups).
+- 2NF (Second Normal Form): Đạt 1NF VÀ không có phụ thuộc hàm bộ phận vào khóa chính hợp thành (Mọi thuộc tính không khóa phải phụ thuộc vào toàn bộ PK).
+- 3NF (Third Normal Form): Đạt 2NF VÀ không có phụ thuộc bắc cầu (Thuộc tính không khóa không được phụ thuộc vào một thuộc tính không khóa khác).`,
         keyTakeaways: [
           'Chuẩn hóa giúp loại bỏ dị thường thêm, xóa, sửa và triệt tiêu dư thừa dữ liệu.',
           'Mục tiêu thiết kế thực tế luôn hướng tới Dạng chuẩn 3 (3NF).'
@@ -680,16 +680,16 @@ CREATE TABLE SinhVien (
       {
         id: 'sec-4-1',
         title: '1. Tổng quan Ngôn ngữ SQL & 5 Phân hệ Con (DDL, DML, DQL, DCL, TCL)',
-        content: `**SQL (Structured Query Language)** là ngôn ngữ chuẩn quốc tế (ANSI/ISO) dùng để quản trị và thao tác dữ liệu. SQL được chia làm 5 nhóm phân hệ chức năng:
-1. **DDL (Data Definition Language - Ngôn ngữ Định nghĩa Dữ liệu):** Dùng để định nghĩa hoặc thay đổi cấu trúc bảng.
+        content: `SQL (Structured Query Language) là ngôn ngữ chuẩn quốc tế (ANSI/ISO) dùng để quản trị và thao tác dữ liệu. SQL được chia làm 5 nhóm phân hệ chức năng:
+1. DDL (Data Definition Language - Ngôn ngữ Định nghĩa Dữ liệu): Dùng để định nghĩa hoặc thay đổi cấu trúc bảng.
    - Các lệnh chính: \`CREATE\`, \`ALTER\`, \`DROP\`, \`TRUNCATE\`.
-2. **DML (Data Manipulation Language - Ngôn ngữ Thao tác Dữ liệu):** Dùng để thay đổi nội dung dữ liệu bên trong bảng.
+2. DML (Data Manipulation Language - Ngôn ngữ Thao tác Dữ liệu): Dùng để thay đổi nội dung dữ liệu bên trong bảng.
    - Các lệnh chính: \`INSERT\`, \`UPDATE\`, \`DELETE\`.
-3. **DQL (Data Query Language - Ngôn ngữ Truy vấn Dữ liệu):** Dùng để trích xuất và đọc thông tin từ các bảng.
+3. DQL (Data Query Language - Ngôn ngữ Truy vấn Dữ liệu): Dùng để trích xuất và đọc thông tin từ các bảng.
    - Lệnh chính: \`SELECT\`.
-4. **DCL (Data Control Language - Ngôn ngữ Kiểm soát Dữ liệu):** Dùng để cấp phát và thu hồi quyền truy cập bảo mật.
+4. DCL (Data Control Language - Ngôn ngữ Kiểm soát Dữ liệu): Dùng để cấp phát và thu hồi quyền truy cập bảo mật.
    - Các lệnh chính: \`GRANT\`, \`REVOKE\`, \`DENY\`.
-5. **TCL (Transaction Control Language - Ngôn ngữ Điều khiển Giao dịch):** Quản trị tính toàn vẹn phiên làm việc.
+5. TCL (Transaction Control Language - Ngôn ngữ Điều khiển Giao dịch): Quản trị tính toàn vẹn phiên làm việc.
    - Các lệnh chính: \`COMMIT\`, \`ROLLBACK\`, \`SAVEPOINT\`.`,
         keyTakeaways: [
           'DDL tác động vào cấu trúc (Structure/Schema); DML tác động vào nội dung dữ liệu (Data/Rows).',
@@ -745,12 +745,12 @@ CREATE TABLE TenBang (
         id: 'sec-4-3',
         title: '3. Lệnh DML: INSERT, UPDATE, DELETE & Kỹ thuật An toàn',
         content: `Khi cấu trúc bảng đã sẵn sàng, chúng ta thao tác nạp và biến đổi dữ liệu bằng DML:
-- **Lệnh INSERT INTO:** Thêm dòng mới.
+- Lệnh INSERT INTO: Thêm dòng mới.
   - Cú pháp chuẩn an toàn: \`INSERT INTO TenBang (Cot1, Cot2) VALUES (GiaTri1, GiaTri2);\`
   - Hỗ trợ chèn nhiều dòng cùng lúc: \`VALUES (...), (...), (...);\`
-- **Lệnh UPDATE:** Sửa đổi dữ liệu hiện có.
+- Lệnh UPDATE: Sửa đổi dữ liệu hiện có.
   - Cú pháp: \`UPDATE TenBang SET Cot1 = GiaTriMoi WHERE DieuKien;\`
-- **Lệnh DELETE:** Xóa dòng dữ liệu.
+- Lệnh DELETE: Xóa dòng dữ liệu.
   - Cú pháp: \`DELETE FROM TenBang WHERE DieuKien;\`
 
 *Cảnh báo nguyên tắc an toàn dữ liệu:*
@@ -845,7 +845,7 @@ HAVING COUNT(H.MaHS) >= 1;`,
         id: 'sec-6-1',
         title: '1. Hàm Tổng hợp (Aggregate Functions), GROUP BY & Mệnh đề HAVING',
         content: `Để tạo báo cáo thống kê, chúng ta sử dụng các hàm tổng hợp trên từng tập dữ liệu:
-- **5 Hàm tổng hợp cơ bản:**
+- 5 Hàm tổng hợp cơ bản:
   - \`COUNT(*)\`: Đếm tổng số dòng (kể cả dòng có chứa NULL).
   - \`COUNT(TenCot)\`: Đếm số dòng có giá trị khác NULL ở cột đó.
   - \`SUM(TenCot)\`: Tính tổng giá trị số.
@@ -860,9 +860,9 @@ Dùng để lọc các nhóm sau khi đã gom nhóm và tính toán hàm tổng 
 *Bảng so sánh WHERE vs. HAVING:*
 | Đặc điểm | Mệnh đề WHERE | Mệnh đề HAVING |
 | :--- | :--- | :--- |
-| **Đối tượng lọc** | Từng dòng dữ liệu riêng lẻ | Cả nhóm dữ liệu |
-| **Thời điểm thực thi** | Trước khi gom nhóm (Trước GROUP BY) | Sau khi gom nhóm (Sau GROUP BY) |
-| **Dùng hàm tổng hợp?** | KHÔNG ĐƯỢC PHÉP | BẮT BUỘC / ĐƯỢC PHÉP |`,
+| Đối tượng lọc | Từng dòng dữ liệu riêng lẻ | Cả nhóm dữ liệu |
+| Thời điểm thực thi | Trước khi gom nhóm (Trước GROUP BY) | Sau khi gom nhóm (Sau GROUP BY) |
+| Dùng hàm tổng hợp? | KHÔNG ĐƯỢC PHÉP | BẮT BUỘC / ĐƯỢC PHÉP |`,
         sqlExamples: [
           {
             title: 'Thống kê điểm trung bình từng lớp và chỉ lấy lớp có ĐTB >= 8.0',
@@ -885,11 +885,11 @@ HAVING AVG(K.DiemTB) >= 8.0;`,
         id: 'sec-6-2',
         title: '2. Kỹ thuật Nối Bảng: INNER JOIN, LEFT JOIN & Truy vấn Đa bảng',
         content: `Trong CSDL quan hệ chuẩn hóa 3NF, dữ liệu bị phân tách ra nhiều bảng. Các phép \`JOIN\` dùng để ghép các bảng lại với nhau dựa trên mối liên kết Khóa chính - Khóa ngoại:
-1. **INNER JOIN (Nối trong / Giao):** Chỉ trả về những dòng có sự trùng khớp giá trị ở cả 2 bảng trên điều kiện \`ON\`. Những dòng không có liên kết ở 1 trong 2 bảng sẽ bị loại bỏ.
-2. **LEFT JOIN / LEFT OUTER JOIN (Nối ngoài bên trái):** Giữ lại TOÀN BỘ các dòng của bảng bên trái; nếu bảng bên phải không có dòng khớp tương ứng thì các cột của bảng phải sẽ được điền giá trị \`NULL\`.
+1. INNER JOIN (Nối trong / Giao): Chỉ trả về những dòng có sự trùng khớp giá trị ở cả 2 bảng trên điều kiện \`ON\`. Những dòng không có liên kết ở 1 trong 2 bảng sẽ bị loại bỏ.
+2. LEFT JOIN / LEFT OUTER JOIN (Nối ngoài bên trái): Giữ lại TOÀN BỘ các dòng của bảng bên trái; nếu bảng bên phải không có dòng khớp tương ứng thì các cột của bảng phải sẽ được điền giá trị \`NULL\`.
    - *Ứng dụng kinh điển:* Tìm những sinh viên chưa đăng ký môn học nào, hoặc tìm lớp học chưa có học sinh!
-3. **RIGHT JOIN:** Tương tự LEFT JOIN nhưng ưu tiên giữ toàn bộ bảng bên phải.
-4. **FULL OUTER JOIN:** Giữ toàn bộ dòng của cả 2 bảng; ô nào không khớp sẽ điền NULL.`,
+3. RIGHT JOIN: Tương tự LEFT JOIN nhưng ưu tiên giữ toàn bộ bảng bên phải.
+4. FULL OUTER JOIN: Giữ toàn bộ dòng của cả 2 bảng; ô nào không khớp sẽ điền NULL.`,
         sqlExamples: [
           {
             title: 'Truy vấn 4 bảng: Xem đầy đủ bảng điểm chi tiết của sinh viên',
@@ -913,10 +913,10 @@ ORDER BY L.TenLop ASC, H.HoTen ASC;`,
         id: 'sec-6-3',
         title: '3. Truy vấn Con (Subquery) & Mệnh đề Rẽ nhánh CASE WHEN',
         content: `Khi câu hỏi nghiệp vụ đòi hỏi tính toán qua nhiều bước:
-- **Truy vấn Con (Subquery):** Là câu lệnh SELECT được lồng bên trong một câu lệnh SQL khác (nằm trong WHERE, HAVING, FROM hoặc SELECT).
+- Truy vấn Con (Subquery): Là câu lệnh SELECT được lồng bên trong một câu lệnh SQL khác (nằm trong WHERE, HAVING, FROM hoặc SELECT).
   - *Subquery đơn dòng:* Trả về 1 giá trị duy nhất (kết hợp các toán tử \`=\`, \`>\`, \`<\`). Ví dụ: Tìm học sinh có điểm cao hơn điểm trung bình toàn trường!
   - *Subquery đa dòng:* Trả về một danh sách các giá trị (kết hợp các toán tử \`IN\`, \`NOT IN\`, \`EXISTS\`, \`ALL\`, \`ANY\`).
-- **Mệnh đề CASE WHEN:** Cung cấp khả năng rẽ nhánh logic tương đương cấu trúc \`if - else\` trong ngôn ngữ lập trình.`,
+- Mệnh đề CASE WHEN: Cung cấp khả năng rẽ nhánh logic tương đương cấu trúc \`if - else\` trong ngôn ngữ lập trình.`,
         sqlExamples: [
           {
             title: 'Tìm học sinh có điểm cao hơn trung bình toàn trường & Xếp loại học lực',
@@ -1018,14 +1018,14 @@ JOIN MonHoc M ON K.MaMH = M.MaMH;`,
       {
         id: 'sec-7-2',
         title: '2. Khung nhìn (VIEW) trong Cơ sở Dữ liệu',
-        content: `**Khung nhìn (VIEW)** là một "bảng ảo" được định nghĩa dựa trên một câu lệnh truy vấn SELECT.
+        content: `Khung nhìn (VIEW) là một "bảng ảo" được định nghĩa dựa trên một câu lệnh truy vấn SELECT.
 - VIEW không chiếm dung lượng lưu trữ dữ liệu vật lý (nó chỉ lưu câu lệnh truy vấn bên trong từ điển dữ liệu).
 - Khi người dùng truy vấn trên VIEW, SQL Server sẽ thực thi câu lệnh định nghĩa bên dưới.
 
 *3 Lợi ích to lớn của VIEW:*
-1. **Đơn giản hóa truy vấn:** Gom các câu lệnh JOIN 4-5 bảng phức tạp thành một bảng ảo ngắn gọn cho các lập trình viên khác sử dụng.
-2. **Bảo mật và Phân quyền:** Cho phép nhân viên chỉ được xem một số cột nhất định (ví dụ ẩn cột Mật khẩu, Lương, Số CCCD) mà không để họ thấy toàn bộ bảng gốc.
-3. **Tính độc lập dữ liệu:** Khi cấu trúc bảng vật lý bên dưới thay đổi, ta chỉ cần sửa câu lệnh trong View mà không làm gãy các ứng dụng đang kết nối.`,
+1. Đơn giản hóa truy vấn: Gom các câu lệnh JOIN 4-5 bảng phức tạp thành một bảng ảo ngắn gọn cho các lập trình viên khác sử dụng.
+2. Bảo mật và Phân quyền: Cho phép nhân viên chỉ được xem một số cột nhất định (ví dụ ẩn cột Mật khẩu, Lương, Số CCCD) mà không để họ thấy toàn bộ bảng gốc.
+3. Tính độc lập dữ liệu: Khi cấu trúc bảng vật lý bên dưới thay đổi, ta chỉ cần sửa câu lệnh trong View mà không làm gãy các ứng dụng đang kết nối.`,
         sqlExamples: [
           {
             title: 'Tạo View xem danh sách sinh viên lớp 12A1 kèm xếp loại',
@@ -1050,12 +1050,12 @@ SELECT * FROM vw_SinhVien12A1 WHERE GioiTinh = N'Nữ';`,
         id: 'sec-7-3',
         title: '3. Giao dịch (Transaction - ACID) & Phòng tránh SQL Injection',
         content: `Trong các hoạt động nghiệp vụ như chuyển tiền ngân hàng hay đăng ký học phần:
-**Giao dịch (Transaction)** là một chuỗi các thao tác SQL được thực hiện như một đơn vị công việc duy nhất và bất khả phân.
+Giao dịch (Transaction) là một chuỗi các thao tác SQL được thực hiện như một đơn vị công việc duy nhất và bất khả phân.
 *4 Thuộc tính vàng ACID:*
-- **A - Atomicity (Tính nguyên tử):** "Tất cả hoặc không gì cả". Hoặc là toàn bộ các câu lệnh trong giao dịch hoàn thành thành công, hoặc không có câu lệnh nào được lưu lại (Rollback về trạng thái ban đầu).
-- **C - Consistency (Tính nhất quán):** CSDL chuyển từ một trạng thái hợp lệ này sang một trạng thái hợp lệ khác, không vi phạm bất kỳ ràng buộc nào.
-- **I - Isolation (Tính cô lập):** Các giao dịch thực thi đồng thời không được can thiệp hoặc nhìn thấy trạng thái trung gian chưa hoàn tất của nhau.
-- **D - Durability (Tính bền vững):** Khi giao dịch đã COMMIT thành công, dữ liệu sẽ được lưu vĩnh viễn trên đĩa cứng ngay cả khi mất điện đột ngột.
+- A - Atomicity (Tính nguyên tử): "Tất cả hoặc không gì cả". Hoặc là toàn bộ các câu lệnh trong giao dịch hoàn thành thành công, hoặc không có câu lệnh nào được lưu lại (Rollback về trạng thái ban đầu).
+- C - Consistency (Tính nhất quán): CSDL chuyển từ một trạng thái hợp lệ này sang một trạng thái hợp lệ khác, không vi phạm bất kỳ ràng buộc nào.
+- I - Isolation (Tính cô lập): Các giao dịch thực thi đồng thời không được can thiệp hoặc nhìn thấy trạng thái trung gian chưa hoàn tất của nhau.
+- D - Durability (Tính bền vững): Khi giao dịch đã COMMIT thành công, dữ liệu sẽ được lưu vĩnh viễn trên đĩa cứng ngay cả khi mất điện đột ngột.
 
 *Cú pháp quản lý Transaction trong SQL Server:*
 \`\`\`sql
@@ -1071,8 +1071,8 @@ COMMIT TRANSACTION;
 \`\`\`
 
 *Nhận thức an toàn: Phòng chống SQL Injection:*
-- **SQL Injection là gì?** Là kỹ thuật tấn công chèn các đoạn mã SQL độc hại vào các ô nhập liệu của người dùng trên Web Form (ví dụ nhập: \`' OR '1'='1\`) để bẻ gãy câu lệnh logic và xem trộm toàn bộ dữ liệu hoặc xóa sổ bảng.
-- **Biện pháp phòng vệ tuyệt đối:** Sử dụng **Truy vấn có tham số (Parameterized Queries / Prepared Statements)**. Khi đó hệ quản trị xem nội dung người dùng nhập hoàn toàn là dữ liệu chuỗi thô, triệt tiêu khả năng biên dịch thành mã lệnh!`,
+- SQL Injection là gì? Là kỹ thuật tấn công chèn các đoạn mã SQL độc hại vào các ô nhập liệu của người dùng trên Web Form (ví dụ nhập: \`' OR '1'='1\`) để bẻ gãy câu lệnh logic và xem trộm toàn bộ dữ liệu hoặc xóa sổ bảng.
+- Biện pháp phòng vệ tuyệt đối: Sử dụng Truy vấn có tham số (Parameterized Queries / Prepared Statements). Khi đó hệ quản trị xem nội dung người dùng nhập hoàn toàn là dữ liệu chuỗi thô, triệt tiêu khả năng biên dịch thành mã lệnh!`,
         keyTakeaways: [
           'Transaction bảo vệ sự toàn vẹn của dữ liệu trong các kịch bản đa bước phức tạp.',
           'Parameterized Query là nguyên tắc phòng thủ bắt buộc đối với mọi lập trình viên kết nối CSDL.'
@@ -1149,11 +1149,11 @@ ORDER BY DiemTrungBinhTichLuy DESC;`,
         title: '1. Bản Mô tả Nghiệp vụ Dự án Thực tế: Hệ thống Quản lý Đào tạo Cao đẳng',
         content: `*Đề bài dự án:*
 Trường Cao đẳng Kỹ thuật Công nghệ cần xây dựng một cơ sở dữ liệu trên Microsoft SQL Server để quản lý công tác đào tạo sinh viên:
-1. **Quản lý Khoa & Giảng viên:** Mỗi khoa có mã khoa, tên khoa, số điện thoại. Mỗi giảng viên thuộc một khoa duy nhất, có học vị và số điện thoại liên hệ.
-2. **Quản lý Lớp học:** Mỗi lớp học có một mã lớp duy nhất, tên lớp, thuộc một khoa và có một giảng viên làm Cố vấn học tập (GVCN).
-3. **Quản lý Sinh viên:** Lưu trữ mã sinh viên, họ tên, giới tính, ngày sinh, quê quán và mã lớp đang theo học.
-4. **Quản lý Môn học (Học phần):** Mỗi môn học có mã môn, tên môn, số tín chỉ và hệ số tính điểm.
-5. **Đăng ký học phần & Kết quả học tập:** Mỗi kỳ, sinh viên đăng ký các môn học. Kết quả gồm điểm chuyên cần, điểm giữa kỳ, điểm thi kết thúc học phần và điểm tổng kết môn.`,
+1. Quản lý Khoa & Giảng viên: Mỗi khoa có mã khoa, tên khoa, số điện thoại. Mỗi giảng viên thuộc một khoa duy nhất, có học vị và số điện thoại liên hệ.
+2. Quản lý Lớp học: Mỗi lớp học có một mã lớp duy nhất, tên lớp, thuộc một khoa và có một giảng viên làm Cố vấn học tập (GVCN).
+3. Quản lý Sinh viên: Lưu trữ mã sinh viên, họ tên, giới tính, ngày sinh, quê quán và mã lớp đang theo học.
+4. Quản lý Môn học (Học phần): Mỗi môn học có mã môn, tên môn, số tín chỉ và hệ số tính điểm.
+5. Đăng ký học phần & Kết quả học tập: Mỗi kỳ, sinh viên đăng ký các môn học. Kết quả gồm điểm chuyên cần, điểm giữa kỳ, điểm thi kết thúc học phần và điểm tổng kết môn.`,
         keyTakeaways: [
           'Đọc kỹ đề bài để nắm bắt các ràng buộc logic thực tế.',
           'Các đối tượng chính: Khoa, GiangVien, LopHoc, SinhVien, MonHoc, DangKy, KetQua.'
@@ -1163,21 +1163,21 @@ Trường Cao đẳng Kỹ thuật Công nghệ cần xây dựng một cơ sở
         id: 'sec-8-2',
         title: '2. Hướng dẫn Từng Bước Thực hiện Dự án (6 Giai đoạn Chuẩn)',
         content: `Để hoàn thành dự án đạt điểm tối đa theo tiêu chuẩn công nghiệp, sinh viên thực hiện theo quy trình 6 bước:
-- **Giai đoạn 1: Thiết kế Sơ đồ ERD:**
+- Giai đoạn 1: Thiết kế Sơ đồ ERD:
   Xác định các thực thể và vẽ sơ đồ liên kết biểu diễn quan hệ 1-N và N-N.
-- **Giai đoạn 2: Chuyển đổi sang Lược đồ Quan hệ & Chuẩn hóa 3NF:**
+- Giai đoạn 2: Chuyển đổi sang Lược đồ Quan hệ & Chuẩn hóa 3NF:
   Phân rã quan hệ Nhiều - Nhiều thành các bảng trung gian; loại bỏ mọi phụ thuộc bộ phận và phụ thuộc bắc cầu.
-- **Giai đoạn 3: Viết Script SQL DDL Tạo CSDL:**
+- Giai đoạn 3: Viết Script SQL DDL Tạo CSDL:
   Khai báo kiểu dữ liệu, khóa chính, khóa ngoại, ràng buộc CHECK và DEFAULT hợp lý.
-- **Giai đoạn 4: Viết Script SQL DML Nạp Dữ liệu Thử nghiệm:**
+- Giai đoạn 4: Viết Script SQL DML Nạp Dữ liệu Thử nghiệm:
   Chuẩn bị tối thiểu 5 lớp, 10 sinh viên, 5 môn học và bảng điểm tương ứng để kiểm thử.
-- **Giai đoạn 5: Xây dựng Bộ Câu hỏi & Câu lệnh Truy vấn Nghiệp vụ Báo cáo:**
+- Giai đoạn 5: Xây dựng Bộ Câu hỏi & Câu lệnh Truy vấn Nghiệp vụ Báo cáo:
   - Báo cáo danh sách sinh viên theo từng lớp.
   - Báo cáo bảng điểm chi tiết của từng sinh viên.
   - Thống kê điểm trung bình và xếp loại sinh viên.
   - Tìm Top sinh viên điểm cao nhất để xét học bổng.
   - Lập danh sách sinh viên nợ môn (Điểm tổng kết < 5.0) để gửi thông báo cảnh báo học vụ.
-- **Giai đoạn 6: Đóng gói Script & Báo cáo Thuyết minh Sản phẩm.**`,
+- Giai đoạn 6: Đóng gói Script & Báo cáo Thuyết minh Sản phẩm.`,
         keyTakeaways: [
           'Thực hiện tuần tự từ phân tích quan niệm đến cài đặt vật lý.',
           'Bộ truy vấn nghiệp vụ là minh chứng trực quan nhất cho thấy CSDL được thiết kế thành công.'
@@ -1187,20 +1187,20 @@ Trường Cao đẳng Kỹ thuật Công nghệ cần xây dựng một cơ sở
         id: 'sec-8-3',
         title: '3. Tiêu chí Đánh giá Dự án (Rubric Chấm điểm Năng lực)',
         content: `Dự án tổng hợp được đánh giá trên thang điểm 100 theo 5 tiêu chí rõ ràng:
-1. **Thiết kế ERD & Chuẩn hóa 3NF (25 điểm):**
+1. Thiết kế ERD & Chuẩn hóa 3NF (25 điểm):
    - Xác định đúng thực thể, thuộc tính và khóa: 10đ
    - Biểu diễn quan hệ chuẩn xác, chuyển đổi đạt chuẩn 3NF không dị thường: 15đ
-2. **Cấu trúc DDL & Hệ thống Ràng buộc (20 điểm):**
+2. Cấu trúc DDL & Hệ thống Ràng buộc (20 điểm):
    - Chọn kiểu dữ liệu tối ưu, chuẩn Microsoft SQL Server: 5đ
    - Đầy đủ ràng buộc PK, FK, NOT NULL, UNIQUE, CHECK, DEFAULT: 15đ
-3. **Chất lượng Bộ Dữ liệu Thử nghiệm DML (15 điểm):**
+3. Chất lượng Bộ Dữ liệu Thử nghiệm DML (15 điểm):
    - Dữ liệu thực tế, có ý nghĩa, hỗ trợ tiếng Việt Unicode (N'): 10đ
    - Không vi phạm toàn vẹn tham chiếu: 5đ
-4. **Bộ Truy vấn Nghiệp vụ SQL DQL (30 điểm):**
+4. Bộ Truy vấn Nghiệp vụ SQL DQL (30 điểm):
    - Truy vấn cơ bản có lọc WHERE, sắp xếp ORDER BY: 10đ
    - Truy vấn nâng cao có JOIN nhiều bảng, GROUP BY và HAVING: 10đ
    - Vận dụng sáng tạo Subquery và biểu thức CASE WHEN: 10đ
-5. **Khung nhìn (VIEW) & Quản trị Toàn vẹn (10 điểm):**
+5. Khung nhìn (VIEW) & Quản trị Toàn vẹn (10 điểm):
    - Xây dựng thành công View nghiệp vụ và giải thích được tính an toàn: 10đ`,
         keyTakeaways: [
           'Rubric định hướng rõ ràng mục tiêu phấn đấu cho từng sinh viên.',

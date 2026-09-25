@@ -323,11 +323,11 @@ WHERE CotChuoi LIKE 'MauKiemTra';
 \`\`\`
 
 *Hai ký tự đại diện thông dụng nhất:*
-1. **Dấu phần trăm (\`%\`):** Đại diện cho 0, 1 hoặc nhiều ký tự bất kỳ.
+1. Dấu phần trăm (\`%\`): Đại diện cho 0, 1 hoặc nhiều ký tự bất kỳ.
    - \`N'Nguyễn%'\`: Bắt đầu bằng chữ "Nguyễn" (Ví dụ: Nguyễn Văn A, Nguyễn Mai...).
    - \`N'%Linh'\`: Kết thúc bằng chữ "Linh" (Ví dụ: Mai Linh, Thùy Linh...).
    - \`N'%Thị%'\`: Chứa từ "Thị" ở bất kỳ vị trí nào trong chuỗi.
-2. **Dấu gạch dưới (\`_\`):** Đại diện cho ĐÚNG MỘT ký tự đơn bất kỳ.
+2. Dấu gạch dưới (\`_\`): Đại diện cho ĐÚNG MỘT ký tự đơn bất kỳ.
    - \`'HS00_'\`: Khớp với HS001, HS002... đến HS009 (đúng 5 ký tự).
    - \`'1_A_'\`: Khớp với 10A1, 12A1, 11A2... (đúng 4 ký tự).`,
         sqlExamples: [
@@ -587,18 +587,18 @@ HAVING COUNT(MaHS) >= 2;`,
         content: `*So sánh trực quan giữa WHERE và HAVING:*
 | Đặc điểm | Mệnh đề WHERE | Mệnh đề HAVING |
 | :--- | :--- | :--- |
-| **Đối tượng lọc** | Từng dòng dữ liệu riêng lẻ | Từng nhóm bản ghi sau khi gom |
-| **Thời điểm thực thi** | Trước khi gom nhóm (Trước GROUP BY) | Sau khi gom nhóm (Sau GROUP BY) |
-| **Dùng hàm tổng hợp?** | TUYỆT ĐỐI KHÔNG ĐƯỢC | BẮT BUỘC / KHUYẾN NGHỊ |
-| **Ảnh hưởng hiệu năng** | Rất tốt (lọc bớt dữ liệu từ đầu) | Xử lý trên tập dữ liệu đã gom |
+| Đối tượng lọc | Từng dòng dữ liệu riêng lẻ | Từng nhóm bản ghi sau khi gom |
+| Thời điểm thực thi | Trước khi gom nhóm (Trước GROUP BY) | Sau khi gom nhóm (Sau GROUP BY) |
+| Dùng hàm tổng hợp? | TUYỆT ĐỐI KHÔNG ĐƯỢC | BẮT BUỘC / KHUYẾN NGHỊ |
+| Ảnh hưởng hiệu năng | Rất tốt (lọc bớt dữ liệu từ đầu) | Xử lý trên tập dữ liệu đã gom |
 
 *Thứ tự thực thi 6 bước của SQL Server:*
-1. **FROM:** Xác định bảng nguồn.
-2. **WHERE:** Lọc bỏ các dòng không thỏa mãn.
-3. **GROUP BY:** Gom các dòng còn lại thành các nhóm.
-4. **HAVING:** Lọc bỏ các nhóm không thỏa mãn.
-5. **SELECT:** Chiếu các cột và hàm tổng hợp ra kết quả.
-6. **ORDER BY:** Sắp xếp tập kết quả cuối cùng.`,
+1. FROM: Xác định bảng nguồn.
+2. WHERE: Lọc bỏ các dòng không thỏa mãn.
+3. GROUP BY: Gom các dòng còn lại thành các nhóm.
+4. HAVING: Lọc bỏ các nhóm không thỏa mãn.
+5. SELECT: Chiếu các cột và hàm tổng hợp ra kết quả.
+6. ORDER BY: Sắp xếp tập kết quả cuối cùng.`,
         sqlExamples: [
           {
             title: 'Kết hợp cả WHERE và HAVING trong cùng một truy vấn',
@@ -686,11 +686,11 @@ ORDER BY TenCot1 [ASC | DESC], TenCot2 [ASC | DESC];
 \`\`\`
 
 *Quy tắc sắp xếp:*
-- **ASC (Ascending - Tăng dần):** Là chế độ mặc định nếu bạn không ghi rõ từ khóa.
+- ASC (Ascending - Tăng dần): Là chế độ mặc định nếu bạn không ghi rõ từ khóa.
   - Số: Từ nhỏ đến lớn (ví dụ: 1 -> 10).
   - Ký tự/Chuỗi: Theo thứ tự bảng chữ cái (A -> Z).
   - Ngày tháng: Từ ngày cũ nhất đến ngày gần đây nhất.
-- **DESC (Descending - Giảm dần):**
+- DESC (Descending - Giảm dần):
   - Số: Từ lớn đến bé (ví dụ: 10 -> 1).
   - Ký tự/Chuỗi: Ngược bảng chữ cái (Z -> A).
   - Ngày tháng: Từ ngày mới nhất đến ngày xa xưa nhất.`,
@@ -932,9 +932,9 @@ FULL OUTER JOIN BangB B ON A.Khoa = B.Khoa;
 \`\`\`
 
 *Ý nghĩa hoạt động:*
-1. **LEFT JOIN:** Giữ lại toàn bộ mọi dòng của bảng bên trái (BangA). Nếu bảng bên phải (BangB) không có dòng tương ứng thì các cột của BangB sẽ tự động nhận giá trị \`NULL\`.
-2. **RIGHT JOIN:** Tương tự LEFT JOIN nhưng ưu tiên giữ lại toàn bộ bảng bên phải (BangB).
-3. **FULL OUTER JOIN:** Giữ lại toàn bộ mọi dòng của cả hai bảng; bên nào thiếu sẽ được điền \`NULL\`.`,
+1. LEFT JOIN: Giữ lại toàn bộ mọi dòng của bảng bên trái (BangA). Nếu bảng bên phải (BangB) không có dòng tương ứng thì các cột của BangB sẽ tự động nhận giá trị \`NULL\`.
+2. RIGHT JOIN: Tương tự LEFT JOIN nhưng ưu tiên giữ lại toàn bộ bảng bên phải (BangB).
+3. FULL OUTER JOIN: Giữ lại toàn bộ mọi dòng của cả hai bảng; bên nào thiếu sẽ được điền \`NULL\`.`,
         sqlExamples: [
           {
             title: 'Thống kê sĩ số tất cả các lớp (kể cả lớp chưa có học sinh nào)',
@@ -956,7 +956,7 @@ GROUP BY L.MaLop, L.TenLop, L.GVCN;`,
       {
         id: 'sec-5-8-2',
         title: '2. Kỹ Thuật Kinh Điển: LEFT JOIN ... WHERE IS NULL',
-        content: `Một trong những ứng dụng phổ biến và quyền lực nhất của \`LEFT JOIN\` là **tìm kiếm các phần tử chưa từng phát sinh dữ liệu**:
+        content: `Một trong những ứng dụng phổ biến và quyền lực nhất của \`LEFT JOIN\` là tìm kiếm các phần tử chưa từng phát sinh dữ liệu:
 - Tìm khách hàng chưa từng mua đơn hàng nào.
 - Tìm học sinh chưa dự thi môn học nào.
 - Tìm sản phẩm tồn kho chưa từng bán được.
@@ -1155,8 +1155,8 @@ WHERE DieuKienXacDinhDongCanSua;
 \`\`\`
 
 *CẢNH BÁO AN TOÀN NGHỀ NGHIỆP:*
-- **Nếu có mệnh đề WHERE:** Chỉ những dòng thỏa mãn điều kiện mới bị sửa đổi.
-- **NẾU THIẾU MỆNH ĐỀ WHERE:** TOÀN BỘ tất cả các dòng trong bảng đều bị cập nhật theo giá trị mới!
+- Nếu có mệnh đề WHERE: Chỉ những dòng thỏa mãn điều kiện mới bị sửa đổi.
+- NẾU THIẾU MỆNH ĐỀ WHERE: TOÀN BỘ tất cả các dòng trong bảng đều bị cập nhật theo giá trị mới!
 
 *Quy tắc vàng của kỹ sư dữ liệu:*
 Trước khi chạy lệnh UPDATE, hãy viết lệnh \`SELECT * FROM TenBang WHERE DieuKien\` để nhìn tận mắt xem chính xác những dòng nào sẽ bị tác động!`,
@@ -1252,7 +1252,7 @@ WHERE DieuKienXacDinhDongCanXoa;
 
 *CẢNH BÁO AN TOÀN SỐNG CÒN:*
 - Nếu có \`WHERE\`: Chỉ những dòng thỏa mãn điều kiện mới bị xóa.
-- **NẾU THIẾU WHERE:** Toàn bộ dữ liệu của bảng sẽ bị xóa sạch!
+- NẾU THIẾU WHERE: Toàn bộ dữ liệu của bảng sẽ bị xóa sạch!
 
 *Ràng buộc Khóa Ngoại (Foreign Key):*
 Nếu bạn cố xóa một dòng trong bảng cha (\`LopHoc\`), nhưng mã lớp đó đang được tham chiếu bởi các học sinh trong bảng con (\`HocSinh\`), SQL Server sẽ CHẶN hành động xóa lại để bảo vệ tính toàn vẹn. Bạn chỉ xóa được khi bảng con không còn dòng nào trỏ đến.`,
@@ -1278,12 +1278,12 @@ WHERE MaHS = 'HS008' AND MaMH = 'TIN';`,
 
 | Tiêu chí | Lệnh DELETE | Lệnh TRUNCATE TABLE | Lệnh DROP TABLE |
 | :--- | :--- | :--- | :--- |
-| **Nhóm lệnh** | DML (Thao tác dữ liệu) | DDL (Định nghĩa dữ liệu) | DDL (Định nghĩa dữ liệu) |
-| **Có dùng WHERE?** | CÓ (Xóa dòng có chọn lọc) | KHÔNG (Xóa sạch toàn bảng) | KHÔNG (Xóa luôn cả bảng) |
-| **Ghi Log giao dịch** | Ghi log chi tiết từng dòng | Ghi log giải phóng trang nhớ | Ghi log xóa metadata |
-| **Tốc độ thực thi** | Chậm hơn với bảng lớn | Rất nhanh | Cực nhanh |
-| **Reset Identity?** | KHÔNG reset bộ đếm tự tăng | CÓ (Reset bộ đếm về 1) | Không còn bảng để xét |
-| **Số phận cấu trúc** | Cấu trúc bảng VẪN CÒN | Cấu trúc bảng VẪN CÒN | Cấu trúc bảng BỊ XÓA MẤT |
+| Nhóm lệnh | DML (Thao tác dữ liệu) | DDL (Định nghĩa dữ liệu) | DDL (Định nghĩa dữ liệu) |
+| Có dùng WHERE? | CÓ (Xóa dòng có chọn lọc) | KHÔNG (Xóa sạch toàn bảng) | KHÔNG (Xóa luôn cả bảng) |
+| Ghi Log giao dịch | Ghi log chi tiết từng dòng | Ghi log giải phóng trang nhớ | Ghi log xóa metadata |
+| Tốc độ thực thi | Chậm hơn với bảng lớn | Rất nhanh | Cực nhanh |
+| Reset Identity? | KHÔNG reset bộ đếm tự tăng | CÓ (Reset bộ đếm về 1) | Không còn bảng để xét |
+| Số phận cấu trúc | Cấu trúc bảng VẪN CÒN | Cấu trúc bảng VẪN CÒN | Cấu trúc bảng BỊ XÓA MẤT |
 
 *Kỹ thuật thử nghiệm xóa an toàn với Transaction:*
 \`\`\`sql
