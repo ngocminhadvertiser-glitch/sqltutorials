@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CURRICULUM_LESSONS } from '../data/curriculumData';
 import { Lesson, BookmarkItem } from '../types';
 import { 
@@ -19,7 +19,11 @@ import {
   HelpCircle,
   Eye,
   EyeOff,
-  Bookmark
+  Bookmark,
+  Search,
+  Sparkles,
+  Filter,
+  ChevronRight
 } from 'lucide-react';
 
 interface LessonViewerProps {
@@ -48,6 +52,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   );
   const [activeNormTab, setActiveNormTab] = useState<number>(0);
   const [showAnswerKey, setShowAnswerKey] = useState<boolean>(false);
+  const [chapterFilter, setChapterFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     if (initialSelectedLessonId) {
@@ -61,6 +67,38 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const isLessonBookmarked = bookmarks.some(
     (b) => b.type === 'lesson' && b.targetId === currentLesson.id
   );
+
+  // Group chapters
+  const chaptersList = useMemo(() => {
+    const map = new Map<string, { id: string; title: string; count: number }>();
+    CURRICULUM_LESSONS.forEach((l) => {
+      const existing = map.get(l.chapterId);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        map.set(l.chapterId, { id: l.chapterId, title: l.chapterTitle.split(':')[0], count: 1 });
+      }
+    });
+    return Array.from(map.values());
+  }, []);
+
+  // Filter lessons
+  const filteredLessons = useMemo(() => {
+    return CURRICULUM_LESSONS.filter((lesson) => {
+      const matchesChapter = chapterFilter === 'all' || lesson.chapterId === chapterFilter;
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        lesson.title.toLowerCase().includes(q) ||
+        lesson.description.toLowerCase().includes(q);
+      return matchesChapter && matchesSearch;
+    });
+  }, [chapterFilter, searchQuery]);
+
+  // Chapter 5 sequence
+  const chapter5Lessons = useMemo(() => {
+    return CURRICULUM_LESSONS.filter((l) => l.chapterId === 'chuong-5');
+  }, []);
 
   const getLevelBadge = (level: Lesson['level']) => {
     switch (level) {
@@ -81,7 +119,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-indigo-600" />
-              Chương trình Học 8 Chương
+              Chương trình Học (8 Chương)
             </h3>
             <span className="text-xs text-slate-500 font-semibold">
               {completedLessons.length}/{CURRICULUM_LESSONS.length} bài
@@ -89,63 +127,131 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-slate-100 rounded-full h-2 mb-4 overflow-hidden">
+          <div className="w-full bg-slate-100 rounded-full h-2 mb-3 overflow-hidden">
             <div
               className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(completedLessons.length / CURRICULUM_LESSONS.length) * 100}%` }}
             />
           </div>
 
+          {/* Search and Chapter Filter Chips */}
+          <div className="space-y-2 mb-3">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm bài học (SELECT, WHERE, JOIN...)"
+                className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 text-slate-800 placeholder-slate-400"
+              />
+            </div>
+
+            {/* Chapter filter selector */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+              <button
+                onClick={() => setChapterFilter('all')}
+                className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                  chapterFilter === 'all'
+                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                Tất cả ({CURRICULUM_LESSONS.length})
+              </button>
+              <button
+                onClick={() => setChapterFilter('chuong-5')}
+                className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors flex items-center gap-1 cursor-pointer ${
+                  chapterFilter === 'chuong-5'
+                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                    : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-semibold'
+                }`}
+              >
+                <Sparkles className="w-3 h-3 text-amber-500" />
+                <span>Chương 5 (11 bài)</span>
+              </button>
+              {chaptersList
+                .filter((c) => c.id !== 'chuong-5')
+                .map((ch) => (
+                  <button
+                    key={ch.id}
+                    onClick={() => setChapterFilter(ch.id)}
+                    className={`px-2 py-1 rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
+                      chapterFilter === ch.id
+                        ? 'bg-indigo-600 text-white font-bold'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {ch.title}
+                  </button>
+                ))}
+            </div>
+          </div>
+
           {/* List */}
-          <div className="space-y-2 max-h-[720px] overflow-y-auto pr-1">
-            {CURRICULUM_LESSONS.map((lesson, idx) => {
-              const isSelected = lesson.id === selectedLessonId;
-              const isDone = completedLessons.includes(lesson.id);
+          <div className="space-y-2 max-h-[640px] overflow-y-auto pr-1">
+            {filteredLessons.length === 0 ? (
+              <div className="text-center py-8 text-slate-400 text-xs">
+                Không tìm thấy bài học phù hợp với từ khóa "{searchQuery}"
+              </div>
+            ) : (
+              filteredLessons.map((lesson) => {
+                const isSelected = lesson.id === selectedLessonId;
+                const isDone = completedLessons.includes(lesson.id);
+                const globalIdx = CURRICULUM_LESSONS.findIndex((l) => l.id === lesson.id);
 
-              return (
-                <button
-                  key={lesson.id}
-                  id={`lesson-item-${lesson.id}`}
-                  onClick={() => {
-                    setSelectedLessonId(lesson.id);
-                    setActiveNormTab(0);
-                    setShowAnswerKey(false);
-                  }}
-                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-start justify-between gap-2 ${
-                    isSelected
-                      ? 'bg-indigo-50 border-indigo-300 text-indigo-900 shadow-xs'
-                      : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
-                  }`}
-                >
-                  <div className="space-y-1 min-w-0">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                      {lesson.chapterTitle.split(':')[0]}
-                    </span>
-                    <h4 className="font-bold text-xs leading-snug line-clamp-2">
-                      {lesson.title}
-                    </h4>
-                    <div className="flex items-center gap-2 pt-1">
-                      {getLevelBadge(lesson.level)}
-                      <span className="text-[11px] text-slate-400 flex items-center gap-0.5">
-                        <Clock className="w-3 h-3" /> {lesson.estimatedMinutes}p
-                      </span>
+                return (
+                  <button
+                    key={lesson.id}
+                    id={`lesson-item-${lesson.id}`}
+                    onClick={() => {
+                      setSelectedLessonId(lesson.id);
+                      setActiveNormTab(0);
+                      setShowAnswerKey(false);
+                    }}
+                    className={`w-full text-left p-3 rounded-xl border transition-all flex items-start justify-between gap-2 cursor-pointer ${
+                      isSelected
+                        ? 'bg-indigo-50 border-indigo-300 text-indigo-900 shadow-xs'
+                        : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
+                    }`}
+                  >
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                          {lesson.chapterTitle.split(':')[0]}
+                        </span>
+                        {lesson.chapterId === 'chuong-5' && (
+                          <span className="px-1.5 py-0.2 bg-indigo-100 text-indigo-700 rounded-sm text-[10px] font-semibold">
+                            SQL Core
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="font-bold text-xs leading-snug line-clamp-2">
+                        {lesson.title}
+                      </h4>
+                      <div className="flex items-center gap-2 pt-1">
+                        {getLevelBadge(lesson.level)}
+                        <span className="text-[11px] text-slate-400 flex items-center gap-0.5">
+                          <Clock className="w-3 h-3" /> {lesson.estimatedMinutes}p
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="shrink-0 mt-1">
-                    {isDone ? (
-                      <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center">
-                        <Check className="w-3 h-3" />
-                      </span>
-                    ) : (
-                      <span className="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] text-slate-400">
-                        {idx + 1}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
+                    <div className="shrink-0 mt-1">
+                      {isDone ? (
+                        <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                          <Check className="w-3 h-3" />
+                        </span>
+                      ) : (
+                        <span className="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] text-slate-400">
+                          {globalIdx + 1}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })
+            )}
           </div>
 
           {/* Quick link to ERD Studio */}
@@ -228,6 +334,76 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Chapter 5 Interactive Roadmap: Lộ trình 11 nội dung từ Cơ bản đến Phức hợp */}
+          {currentLesson.chapterId === 'chuong-5' && (
+            <div className="bg-gradient-to-r from-indigo-50/90 via-purple-50/60 to-blue-50/90 border border-indigo-200/80 rounded-2xl p-4 space-y-3 shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs font-black shadow-2xs">
+                    5
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-indigo-950 flex items-center gap-2">
+                      <span>Lộ trình Chương 5: Tiếp cận từ Cơ bản đến Phức hợp</span>
+                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-bold">
+                        11 nội dung & cú pháp
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-slate-500">
+                      Mỗi từ khóa/mệnh đề đều giới thiệu cú pháp chuẩn và ví dụ mẫu trực quan
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-indigo-700 font-bold bg-white px-2.5 py-1 rounded-lg border border-indigo-200 shadow-2xs">
+                  Bước {chapter5Lessons.findIndex((l) => l.id === currentLesson.id) + 1} / {chapter5Lessons.length}
+                </div>
+              </div>
+
+              {/* Steps Roadmap Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-11 gap-1.5 pt-1">
+                {chapter5Lessons.map((l, index) => {
+                  const isCurrent = l.id === currentLesson.id;
+                  const isDone = completedLessons.includes(l.id);
+                  const shortName = l.title.split(':')[1]?.trim() || l.title;
+
+                  return (
+                    <button
+                      key={l.id}
+                      onClick={() => {
+                        setSelectedLessonId(l.id);
+                        setActiveNormTab(0);
+                        setShowAnswerKey(false);
+                      }}
+                      title={l.title}
+                      className={`p-2 rounded-xl text-left transition-all border cursor-pointer relative group flex flex-col justify-between ${
+                        isCurrent
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-300'
+                          : isDone
+                          ? 'bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between w-full mb-1">
+                        <span className={`text-[10px] font-bold ${isCurrent ? 'text-indigo-200' : 'text-slate-400'}`}>
+                          0{index + 1}
+                        </span>
+                        {isDone && (
+                          <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] ${isCurrent ? 'bg-white text-indigo-600' : 'bg-emerald-500 text-white'}`}>
+                            ✓
+                          </span>
+                        )}
+                      </div>
+                      <span className={`text-[10.5px] font-bold line-clamp-1 leading-tight ${isCurrent ? 'text-white' : 'text-slate-800'}`}>
+                        {shortName.split(' ')[0]} {shortName.split(' ')[1] || ''}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Module 1: Thông tin Bài học (Tiên quyết & Mục tiêu đào tạo) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -572,7 +748,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           )}
 
           {/* Footer Navigation */}
-          <div className="border-t border-slate-100 pt-5 flex items-center justify-between">
+          <div className="border-t border-slate-100 pt-5 flex items-center justify-between gap-3">
             <button
               disabled={currentIndex === 0}
               onClick={() => {
@@ -580,10 +756,15 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 setActiveNormTab(0);
                 setShowAnswerKey(false);
               }}
-              className="px-4 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer max-w-[45%]"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Bài trước</span>
+              <ArrowLeft className="w-4 h-4 shrink-0" />
+              <div className="text-left min-w-0">
+                <span className="text-[10px] text-slate-400 block font-normal">Bài trước</span>
+                <span className="truncate block font-bold">
+                  {currentIndex > 0 ? CURRICULUM_LESSONS[currentIndex - 1].title.split(':')[0] : 'Đầu danh mục'}
+                </span>
+              </div>
             </button>
 
             <button
@@ -593,10 +774,17 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 setActiveNormTab(0);
                 setShowAnswerKey(false);
               }}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer max-w-[45%]"
             >
-              <span>Bài tiếp theo</span>
-              <ArrowRight className="w-4 h-4" />
+              <div className="text-right min-w-0">
+                <span className="text-[10px] text-indigo-200 block font-normal">Bài tiếp theo</span>
+                <span className="truncate block font-bold">
+                  {currentIndex < CURRICULUM_LESSONS.length - 1
+                    ? CURRICULUM_LESSONS[currentIndex + 1].title.split(':')[0]
+                    : 'Cuối giáo trình'}
+                </span>
+              </div>
+              <ArrowRight className="w-4 h-4 shrink-0" />
             </button>
           </div>
         </article>

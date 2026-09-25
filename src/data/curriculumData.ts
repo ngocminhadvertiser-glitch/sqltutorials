@@ -1,4 +1,5 @@
 import { Lesson } from '../types';
+import { CHAPTER_5_LESSONS } from './chapter5Lessons';
 
 export const CURRICULUM_LESSONS: Lesson[] = [
   // =========================================================================
@@ -634,144 +635,9 @@ WHERE MaHS = 'HS002' AND MaMH = 'TIN';`,
   },
 
   // =========================================================================
-  // CHƯƠNG 5: TRUY VẤN DỮ LIỆU SQL
+  // CHƯƠNG 5: THAO TÁC & TRUY VẤN DỮ LIỆU SQL (11 BÀI HỌC TỪ CƠ BẢN ĐẾN PHỨC HỢP)
   // =========================================================================
-  {
-    id: 'bai-5-truy-van-du-lieu-sql',
-    chapterId: 'chuong-5',
-    chapterTitle: 'Chương 5: Truy vấn Dữ liệu SQL (DQL Chuyên sâu)',
-    title: 'Bài 5: SELECT, Mệnh đề WHERE, Toán tử So sánh, Logic, LIKE, BETWEEN, ORDER BY & Hàm Tích hợp',
-    description: 'Khai thác tối đa sức mạnh của câu lệnh SELECT: thứ tự thực thi trong RDBMS, mệnh đề WHERE, toán tử LIKE tìm kiếm mẫu, sắp xếp ORDER BY, phân trang TOP/LIMIT và các hàm xử lý chuỗi, ngày tháng.',
-    level: 'co-ban',
-    competency: 'truy-van-co-ban',
-    estimatedMinutes: 35,
-    prerequisites: [
-      'Bài 4: Khái niệm bảng và câu lệnh SQL cơ bản'
-    ],
-    learningObjectives: [
-      'Hiểu rõ cấu trúc đầy đủ của câu lệnh SELECT và thứ tự thực thi nội tại của máy ảo SQL Server.',
-      'Sử dụng thành thạo mệnh đề WHERE kết hợp các toán tử logic: AND, OR, NOT và toán tử so sánh.',
-      'Áp dụng các toán tử lọc nâng cao: LIKE (với ký tự đại diện %, _), BETWEEN ... AND ..., IN (...), IS NULL / IS NOT NULL.',
-      'Sắp xếp kết quả linh hoạt bằng ORDER BY (ASC, DESC) trên một hoặc nhiều cột.',
-      'Loại bỏ các dòng trùng lặp bằng từ khóa DISTINCT.',
-      'Giới hạn số dòng trả về với TOP (trong SQL Server) hoặc LIMIT (trong MySQL).',
-      'Vận dụng các hàm chuẩn xử lý chuỗi (LEN, UPPER, LOWER, SUBSTRING, CONCAT) và ngày tháng (GETDATE, YEAR, MONTH, DATEDIFF).'
-    ],
-    relatedTable: 'HocSinh',
-    suggestedPracticeSql: "SELECT TOP 5 MaHS, HoTen, GioiTinh, DiaChi FROM HocSinh WHERE GioiTinh = N'Nữ' ORDER BY HoTen ASC;",
-    commonMistakes: [
-      {
-        mistake: 'So sánh giá trị rỗng bằng dấu bằng (ví dụ: WHERE DiaChi = NULL).',
-        correction: 'Trong SQL, NULL biểu thị trạng thái "chưa biết" nên KHÔNG THỂ so sánh bằng toán tử = hoặc <>. Bắt buộc phải dùng IS NULL hoặc IS NOT NULL.',
-        why: 'Mọi phép so sánh với NULL bằng toán tử = đều trả về kết quả UNKNOWN (coi như False trong mệnh đề WHERE).'
-      },
-      {
-        mistake: 'Nhầm lẫn thứ tự viết câu lệnh với thứ tự RDBMS thực thi.',
-        correction: 'SQL viết SELECT trước FROM, nhưng máy chủ SQL Server thực thi FROM trước -> WHERE -> SELECT -> ORDER BY.',
-        why: 'Do đó bạn không thể dùng Bí danh (Alias) đặt ở SELECT bên trong mệnh đề WHERE!'
-      }
-    ],
-    sections: [
-      {
-        id: 'sec-5-1',
-        title: '1. Cấu trúc Lệnh SELECT & Thứ tự Thực thi trong RDBMS',
-        content: `Câu lệnh \`SELECT\` là công cụ quan trọng nhất để trích xuất thông tin.
-*Thứ tự viết cú pháp (Syntax Order):*
-\`\`\`sql
-SELECT [DISTINCT] [TOP n] DanhSachCot
-FROM TenBang
-WHERE DieuKienLocDong
-ORDER BY CotSapXep [ASC | DESC];
-\`\`\`
-
-*Thứ tự thực thi nội tại của Hệ quản trị CSDL (Execution Order):*
-1. **FROM:** Xác định bảng nguồn cần đọc dữ liệu.
-2. **WHERE:** Lọc bỏ các dòng không thỏa mãn điều kiện logic.
-3. **SELECT:** Chỉ chiếu (Project) các cột được yêu cầu ra kết quả.
-4. **DISTINCT:** Khử các dòng trùng lặp (nếu có).
-5. **TOP:** Giữ lại số lượng dòng tối đa được yêu cầu.
-6. **ORDER BY:** Sắp xếp kết quả cuối cùng trước khi hiển thị cho người dùng.`,
-        keyTakeaways: [
-          'Hiểu đúng thứ tự thực thi giúp giải thích tại sao không dùng được Alias của SELECT trong WHERE.',
-          'Dùng SELECT tên cột cụ thể thay vì SELECT * để tối ưu tốc độ mạng và bộ nhớ.'
-        ]
-      },
-      {
-        id: 'sec-5-2',
-        title: '2. Mệnh đề WHERE & Bộ Toán tử Lọc Mạnh mẽ (LIKE, IN, BETWEEN, IS NULL)',
-        content: `Mệnh đề \`WHERE\` quyết định dòng nào được giữ lại:
-- **Toán tử so sánh:** \`=\`, \`<>\` (hoặc \`!=\`), \`<\`, \`>\`, \`<=\`, \`>=\`.
-- **Toán tử logic:** \`AND\` (đồng thời thỏa mãn), \`OR\` (thỏa mãn một trong các), \`NOT\` (phủ định).
-- **Toán tử BETWEEN ... AND ...:** Lọc trong khoảng đóng [Min, Max] (bao gồm cả 2 đầu mút).
-- **Toán tử IN (gt1, gt2, ...):** Kiểm tra giá trị có nằm trong tập hợp liệt kê hay không.
-- **Toán tử LIKE (Tìm kiếm mẫu chuỗi):**
-  - \`%\`: Đại diện cho một chuỗi gồm 0 hoặc nhiều ký tự bất kỳ.
-    *(Ví dụ: \`HoTen LIKE N'Nguyễn%'\` tìm tất cả người họ Nguyễn).*
-  - \`_\`: Đại diện cho đúng 1 ký tự bất kỳ.
-    *(Ví dụ: \`MaLop LIKE '1_A_'\`).*
-- **Toán tử IS NULL / IS NOT NULL:** Kiểm tra ô dữ liệu có bị để trống hay không.`,
-        sqlExamples: [
-          {
-            title: 'Tìm học sinh họ Nguyễn hoặc ở Hà Nội sinh sau năm 2008',
-            description: 'Kết hợp toán tử LIKE, IN và hàm trích xuất ngày YEAR',
-            sql: `SELECT MaHS, HoTen, GioiTinh, NgaySinh, DiaChi 
-FROM HocSinh 
-WHERE (HoTen LIKE N'Nguyễn%' OR DiaChi = N'Hà Nội')
-  AND YEAR(NgaySinh) >= 2008;`,
-            explanation: 'Dùng dấu ngoặc đơn () để gom nhóm điều kiện logic OR, đảm bảo phép toán AND bên ngoài áp dụng chính xác cho toàn bộ biểu thức.',
-            expectedResult: 'Danh sách các học sinh thỏa mãn đồng thời tiêu chí địa chỉ/họ và năm sinh.'
-          }
-        ],
-        keyTakeaways: [
-          'Luôn dùng ngoặc đơn () khi kết hợp AND và OR để tránh nhầm lẫn độ ưu tiên toán tử.',
-          'So sánh với NULL luôn dùng IS NULL hoặc IS NOT NULL.'
-        ]
-      },
-      {
-        id: 'sec-5-3',
-        title: '3. Sắp xếp ORDER BY, Phân trang TOP/LIMIT & Các Hàm Xử lý Tích hợp',
-        content: `Sau khi lọc dữ liệu, việc sắp xếp và tính toán trên từng trường là nhu cầu thiết yếu:
-- **ORDER BY:** Sắp xếp theo một hoặc nhiều cột.
-  - \`ASC\` (Mặc định): Tăng dần (từ nhỏ đến lớn, A -> Z).
-  - \`DESC\`: Giảm dần (từ lớn đến nhỏ, Z -> A).
-- **DISTINCT:** Lọc bỏ các dòng có giá trị trùng nhau hoàn toàn trong danh sách cột SELECT.
-- **TOP (n):** Chỉ lấy n dòng đầu tiên (thường kết hợp ORDER BY để tìm Top điểm cao nhất).
-- **Các hàm xử lý thông dụng:**
-  - *Chuỗi:* \`LEN(str)\` (độ dài), \`UPPER(str)\` (viết hoa), \`LOWER(str)\` (viết thường), \`SUBSTRING(str, start, len)\` (cắt chuỗi), \`CONCAT(str1, str2)\` (nối chuỗi).
-  - *Ngày tháng:* \`GETDATE()\` (thời điểm hiện tại), \`DAY(d)\`, \`MONTH(d)\`, \`YEAR(d)\`, \`DATEDIFF(day, d1, d2)\` (tính khoảng cách ngày).
-  - *Số:* \`ROUND(val, n)\`, \`ABS(val)\`, \`CEILING(val)\`, \`FLOOR(val)\`.`,
-        sqlExamples: [
-          {
-            title: 'Lấy danh sách 3 môn học có điểm thi cuối kỳ cao nhất',
-            description: 'Dùng TOP kết hợp ORDER BY DESC và hàm làm tròn',
-            sql: `SELECT TOP 3 MaHS, MaMH, ROUND(DiemCK, 1) AS DiemCuoiKy, DiemTB 
-FROM KetQua 
-ORDER BY DiemCK DESC, DiemTB DESC;`,
-            explanation: 'SQL Server sắp xếp toàn bộ bảng theo DiemCK giảm dần, nếu trùng điểm sẽ xét tiếp DiemTB, sau đó lấy đúng 3 dòng dẫn đầu.',
-            expectedResult: '3 bản ghi điểm thi xuất sắc nhất.'
-          }
-        ],
-        keyTakeaways: [
-          'Lệnh TOP chỉ thực sự có ý nghĩa khi đi kèm với mệnh đề ORDER BY.',
-          'Bí danh cột (AS) giúp tiêu đề kết quả rõ ràng, dễ đọc trong ứng dụng.'
-        ]
-      }
-    ],
-    practiceLevels: {
-      level1: 'Viết câu lệnh SELECT hiển thị HoTen, NgaySinh của các học sinh nữ trong trường, sắp xếp theo ngày sinh tăng dần.',
-      level2: 'Viết truy vấn tìm tất cả học sinh có họ chứa chữ "Thị" hoặc có địa chỉ ở Hà Nội hoặc Đà Nẵng, sinh từ năm 2008 đến 2009.',
-      level3: 'Hiển thị Họ tên học sinh viết hoa toàn bộ và tuổi hiện tại (tính theo năm) của từng học sinh.'
-    },
-    endOfLessonReview: {
-      summaryQuestion: 'Tại sao câu lệnh sau đây lại báo lỗi cú pháp: SELECT HoTen, YEAR(NgaySinh) AS NamSinh FROM HocSinh WHERE NamSinh = 2008; ?',
-      sqlChallenge: `SELECT DISTINCT DiaChi 
-FROM HocSinh 
-WHERE DiaChi IS NOT NULL 
-ORDER BY DiaChi ASC;`,
-      scenarioQuestion: 'Bạn cần xây dựng tính năng tìm kiếm sinh viên trên thanh tìm kiếm của website trường (cho phép gõ từ khóa bất kỳ xuất hiện trong tên). Câu lệnh SQL mẫu nên viết như thế nào?',
-      teacherAnswerKey: 'Câu lệnh bị lỗi vì mệnh đề WHERE được thực thi trước mệnh đề SELECT trong chu trình xử lý của SQL Server; tại thời điểm xét WHERE, bí danh NamSinh chưa hề tồn tại! Cách sửa: Viết WHERE YEAR(NgaySinh) = 2008. Cho thanh tìm kiếm: Dùng cú pháp WHERE HoTen LIKE N\'%\' + @TuKhoa + N\'%\'.'
-    }
-  },
+  ...CHAPTER_5_LESSONS,
 
   // =========================================================================
   // CHƯƠNG 6: TRUY VẤN NÂNG CAO
@@ -786,7 +652,7 @@ ORDER BY DiaChi ASC;`,
     competency: 'gom-nhom-thong-ke',
     estimatedMinutes: 45,
     prerequisites: [
-      'Bài 5: Truy vấn SELECT cơ bản và mệnh đề WHERE'
+      'Chương 5: Danh mục 11 bài học thao tác & truy vấn SQL (SELECT, WHERE, LIKE, GROUP BY, HAVING, ORDER BY, JOINS, DML)'
     ],
     learningObjectives: [
       'Sử dụng chính xác 5 hàm tổng hợp: COUNT, SUM, AVG, MIN, MAX và hiểu cách xử lý giá trị NULL.',
