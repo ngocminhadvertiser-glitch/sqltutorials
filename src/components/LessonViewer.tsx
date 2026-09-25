@@ -100,6 +100,11 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     return CURRICULUM_LESSONS.filter((l) => l.chapterId === 'chuong-5');
   }, []);
 
+  // Chapter 2 sequence (Chuẩn THCS: Khóa chính & Khóa ngoại)
+  const chapter2Lessons = useMemo(() => {
+    return CURRICULUM_LESSONS.filter((l) => l.chapterId === 'chuong-2');
+  }, []);
+
   const getLevelBadge = (level: Lesson['level']) => {
     switch (level) {
       case 'co-ban':
@@ -160,6 +165,16 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 Tất cả ({CURRICULUM_LESSONS.length})
               </button>
               <button
+                onClick={() => setChapterFilter('chuong-2')}
+                className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors flex items-center gap-1 cursor-pointer ${
+                  chapterFilter === 'chuong-2'
+                    ? 'bg-emerald-600 text-white shadow-2xs font-bold'
+                    : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 font-semibold'
+                }`}
+              >
+                <span>🌱 Chương 2 (Cấp 2)</span>
+              </button>
+              <button
                 onClick={() => setChapterFilter('chuong-5')}
                 className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors flex items-center gap-1 cursor-pointer ${
                   chapterFilter === 'chuong-5'
@@ -171,7 +186,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 <span>Chương 5 (11 bài)</span>
               </button>
               {chaptersList
-                .filter((c) => c.id !== 'chuong-5')
+                .filter((c) => c.id !== 'chuong-5' && c.id !== 'chuong-2')
                 .map((ch) => (
                   <button
                     key={ch.id}
@@ -334,6 +349,83 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Chapter 2 Roadmap: Chuẩn THCS - Trọng tâm Khóa chính & Khóa ngoại */}
+          {currentLesson.chapterId === 'chuong-2' && (
+            <div className="bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-cyan-50/90 border border-emerald-200/80 rounded-2xl p-4 space-y-3 shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shadow-2xs">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-2">
+                      <span>Chương 2: Mô hình Dữ liệu Quan hệ (Dành cho Học sinh Cấp 2)</span>
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-bold">
+                        Trọng tâm: Khóa chính & Khóa ngoại
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-slate-600">
+                      Tiếp cận trực quan, dễ hiểu qua ví dụ Thẻ học sinh & Danh sách lớp học; loại bỏ các loại khóa lý thuyết phức tạp.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-emerald-800 font-bold bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs">
+                  Bài {chapter2Lessons.findIndex((l) => l.id === currentLesson.id) + 1} / {chapter2Lessons.length}
+                </div>
+              </div>
+
+              {/* 2 Lessons Switcher */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                {chapter2Lessons.map((l, index) => {
+                  const isCurrent = l.id === currentLesson.id;
+                  const isDone = completedLessons.includes(l.id);
+
+                  return (
+                    <button
+                      key={l.id}
+                      onClick={() => {
+                        setSelectedLessonId(l.id);
+                        setActiveNormTab(0);
+                        setShowAnswerKey(false);
+                      }}
+                      className={`p-3 rounded-xl text-left transition-all border cursor-pointer flex items-center justify-between ${
+                        isCurrent
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm ring-2 ring-emerald-300'
+                          : isDone
+                          ? 'bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
+                          isCurrent ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'
+                        }`}>
+                          2.{index + 1}
+                        </span>
+                        <div>
+                          <p className={`text-xs font-bold leading-tight ${isCurrent ? 'text-white' : 'text-slate-900'}`}>
+                            {l.title.split(':')[1]?.trim() || l.title}
+                          </p>
+                          <p className={`text-[11px] line-clamp-1 mt-0.5 ${isCurrent ? 'text-emerald-100' : 'text-slate-500'}`}>
+                            {index === 0 ? 'Mã học sinh độc nhất, 2 quy tắc vàng PK' : 'Cầu nối liên kết bảng, quan hệ 1-N'}
+                          </p>
+                        </div>
+                      </div>
+                      {isDone && (
+                        <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ml-2 ${
+                          isCurrent ? 'bg-white text-emerald-700' : 'bg-emerald-500 text-white'
+                        }`}>
+                          ✓
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Chapter 5 Interactive Roadmap: Lộ trình 11 nội dung từ Cơ bản đến Phức hợp */}
           {currentLesson.chapterId === 'chuong-5' && (

@@ -120,127 +120,280 @@ export const CURRICULUM_LESSONS: Lesson[] = [
   },
 
   // =========================================================================
-  // CHƯƠNG 2: MÔ HÌNH DỮ LIỆU QUAN HỆ
+  // CHƯƠNG 2: MÔ HÌNH DỮ LIỆU QUAN HỆ & KHÓA NỀN TẢNG (DÀNH CHO HỌC SINH CẤP 2)
   // =========================================================================
   {
     id: 'bai-2-mo-hinh-quan-he',
     chapterId: 'chuong-2',
-    chapterTitle: 'Chương 2: Mô hình Dữ liệu Quan hệ & Ràng buộc Toàn vẹn',
-    title: 'Bài 2: Bảng, Dòng, Cột, Khóa & Các Mối Quan Hệ Giữa Các Bảng',
-    description: 'Khám phá cấu trúc bảng quan hệ, khái niệm khóa chính (PK), khóa ngoại (FK), khóa ứng viên, mối quan hệ 1-1, 1-N, N-N và 4 nhóm ràng buộc toàn vẹn dữ liệu.',
+    chapterTitle: 'Chương 2: Cấu trúc Bảng, Khóa Chính & Khóa Ngoại (Nền tảng THCS)',
+    title: 'Bài 2.1: Cấu trúc Bảng & Khóa Chính (Primary Key) - Định danh Học sinh',
+    description: 'Làm quen với cấu trúc bảng dữ liệu (Bảng, Cột, Dòng) và hiểu sâu sắc vai trò của Khóa chính (PRIMARY KEY) qua hình tượng chiếc Thẻ học sinh quen thuộc, không lý thuyết hàn lâm phức tạp.',
     level: 'co-ban',
     competency: 'csdl-quan-he',
-    estimatedMinutes: 35,
+    estimatedMinutes: 20,
     prerequisites: [
       'Bài 1: Khái niệm CSDL và vai trò của DBMS'
     ],
     learningObjectives: [
-      'Hiểu sâu sắc các thuật ngữ: Quan hệ (Bảng), Bộ (Dòng), Thuộc tính (Cột), Miền giá trị (Domain).',
-      'Định nghĩa và phân biệt Khóa chính (Primary Key), Khóa ứng viên (Candidate Key), Siêu khóa (Superkey) và Khóa ngoại (Foreign Key).',
-      'Xác định đúng mối quan hệ giữa các bảng: 1-1, 1-N, N-N trong bài toán quản lý sinh viên thực tế.',
-      'Giải thích và áp dụng 4 loại ràng buộc toàn vẹn: Toàn vẹn thực thể, Toàn vẹn tham chiếu, Toàn vẹn miền giá trị và Ràng buộc do người dùng định nghĩa.'
+      'Hiểu cấu trúc của một bảng dữ liệu qua hình ảnh trực quan: Sổ điểm lớp học (gồm Tên bảng, Cột thông tin và Dòng dữ liệu của từng bạn).',
+      'Nắm vững khái niệm Khóa chính (Primary Key - PK): "Mã định danh cá nhân" độc nhất vô nhị cho mỗi dòng trong bảng.',
+      'Ghi nhớ 2 Quy tắc vàng của Khóa chính: Tuyệt đối không được trùng lặp và không bao giờ được để trống (NOT NULL).',
+      'Hiểu lý do vì sao không nên dùng Họ tên hay Số điện thoại làm Khóa chính trong quản lý học sinh.',
+      'Biết cách khai báo cột Khóa chính cơ bản trong lệnh SQL với từ khóa PRIMARY KEY.'
     ],
     relatedTable: 'HocSinh',
-    suggestedPracticeSql: "SELECT HocSinh.MaHS, HocSinh.HoTen, LopHoc.TenLop, LopHoc.GVCN FROM HocSinh INNER JOIN LopHoc ON HocSinh.MaLop = LopHoc.MaLop;",
-    mermaidDiagram: `erDiagram
-      LOPHOC ||--o{ SINHVIEN : "1 lớp chứa nhiều sinh viên (1-N)"
-      SINHVIEN ||--o{ KETQUA : "1 sinh viên có nhiều điểm (1-N)"
-      MONHOC ||--o{ KETQUA : "1 môn học có nhiều điểm (1-N)"
-      GIANGVIEN ||--o{ LOPHOC : "1 giảng viên cố vấn học tập (1-N)"`,
+    suggestedPracticeSql: "SELECT MaHS, HoTen, GioiTinh, NgaySinh, DiaChi FROM HocSinh;",
+    mermaidDiagram: `graph TD
+      subgraph Bang_HocSinh [BẢNG HỌC SINH (HocSinh)]
+        direction TB
+        C1["⭐ Cột MaHS (KHÓA CHÍNH)"] --- D1["HS001 - Nguyễn Quốc Anh"]
+        C1 --- D2["HS002 - Trần Mai Linh"]
+        C1 --- D3["HS003 - Lê Hoàng Nam"]
+      end
+      subgraph Quy_Tac_Vang [2 Quy tắc vàng của Khóa chính]
+        R1["1. DUY NHẤT (Unique): Không ai trùng mã với ai"]
+        R2["2. KHÔNG ĐƯỢC RỖNG (NOT NULL): Ai cũng phải có mã"]
+      end`,
     commonMistakes: [
       {
-        mistake: 'Chọn thuộc tính có thể thay đổi hoặc có thể trùng lặp làm Khóa chính (như HoTen hoặc SoDienThoai).',
-        correction: 'Khóa chính BẮT BUỘC phải mang tính DUY NHẤT (Unique) và KHÔNG ĐƯỢC PHÉP RỖNG (NOT NULL), không nên thay đổi theo thời gian (như MaSV, MaHS, CCCD).',
-        why: 'Nếu hai người trùng họ tên mà họ tên làm khóa chính thì hệ thống sẽ từ chối lưu người thứ hai!'
+        mistake: 'Nghĩ rằng dùng Họ tên học sinh làm Khóa chính là đủ.',
+        correction: 'Trong một trường học rất hay có các bạn cùng họ và tên (ví dụ: 2 bạn cùng tên "Nguyễn Văn An"). Nếu dùng họ tên làm khóa chính, máy tính sẽ chặn không cho lưu bạn thứ hai vì vi phạm tính duy nhất!',
+        why: 'Khóa chính bắt buộc phải là một mã định danh riêng biệt (như Mã học sinh MaHS trên thẻ học sinh).'
       },
       {
-        mistake: 'Đặt khóa ngoại trỏ vào cột không phải là khóa chính của bảng cha.',
-        correction: 'Khóa ngoại (FK) bắt buộc phải tham chiếu đến Khóa chính (hoặc thuộc tính UNIQUE) của bảng được tham chiếu.',
-        why: 'Để đảm bảo toàn vẹn tham chiếu không bị mơ hồ khi trỏ tới dữ liệu đích.'
+        mistake: 'Bỏ trống ô Khóa chính khi nhập dữ liệu bạn học sinh mới.',
+        correction: 'Khóa chính luôn tuân thủ quy tắc NOT NULL (không được rỗng). Bất kỳ bạn nào khi vào trường cũng phải được cấp mã số học sinh.',
+        why: 'Nếu để trống, máy tính sẽ không biết bạn đó là ai để chấm điểm hoặc xếp lớp học.'
+      },
+      {
+        mistake: 'Cố học thêm các khái niệm hàn lâm như Siêu khóa (Superkey) hay Khóa ứng viên (Candidate key).',
+        correction: 'Ở cấp 2, các em chỉ cần làm chủ Khóa chính (Primary Key) và Khóa ngoại (Foreign Key). Các loại khóa lý thuyết khác không cần thiết và dễ gây quá tải.',
+        why: 'Trong thực tế, chỉ cần Khóa chính và Khóa ngoại là đã xây dựng được 99% các phần mềm quản lý trường học hiện đại!'
       }
     ],
     sections: [
       {
-        id: 'sec-2-1',
-        title: '1. Cấu trúc Mô hình Quan hệ: Bảng, Dòng, Cột và Miền giá trị',
-        content: `Trong mô hình quan hệ của Edgar F. Codd:
-- **Quan hệ (Relation / Table):** Là một bảng dữ liệu 2 chiều. Tên bảng phải mang tính đại diện cho một danh mục thực thể (ví dụ: [SinhVien], [MonHoc], [LopHoc]).
-- **Bộ (Tuple / Record / Row):** Là một dòng trong bảng, đại diện cho một đối tượng cụ thể (ví dụ: sinh viên 'HS001' với đầy đủ thông tin).
-- **Thuộc tính (Attribute / Field / Column):** Là một cột trong bảng, mang một ý nghĩa đặc trưng (ví dụ: MaSV, HoTen, NgaySinh).
-- **Miền giá trị (Domain):** Tập hợp tất cả các giá trị hợp lệ mà thuộc tính đó có thể nhận (ví dụ: Điểm thi phải thuộc miền [0, 10]; Giới tính thuộc miền {'Nam', 'Nữ'}).
-- **Bậc của quan hệ (Degree):** Tổng số cột của bảng.
-- **Lực lượng của quan hệ (Cardinality):** Tổng số dòng hiện có trong bảng.`,
+        id: 'sec-2-1-bang-cot-dong',
+        title: '1. Cấu trúc Bảng dữ liệu: Bảng, Cột và Dòng như Sổ điểm lớp',
+        content: `Trong tin học, Cơ sở dữ liệu quan hệ tổ chức dữ liệu thành các **Bảng (Table)** rất giống với cuốn sổ điểm danh của thầy cô giáo:
+
+- **Bảng (Table):** Là một tập hợp dữ liệu về một đối tượng cụ thể (ví dụ: Bảng [HocSinh], Bảng [LopHoc], Bảng [MonHoc]).
+- **Cột (Column / Thuộc tính):** Đại diện cho một mục thông tin cần quản lý. Mỗi cột có tên riêng và một kiểu dữ liệu quy định:
+  + Cột \`MaHS\`: Chứa chuỗi ký tự mã học sinh (như 'HS001').
+  + Cột \`HoTen\`: Chứa họ và tên học sinh.
+  + Cột \`NgaySinh\`: Chứa ngày tháng năm sinh.
+- **Dòng (Row / Bản ghi):** Đại diện cho thông tin đầy đủ của **MỘT** đối tượng cụ thể. Ví dụ: một dòng lưu đầy đủ thông tin của bạn "Nguyễn Quốc Anh, Nam, sinh ngày 2011-03-15".
+- **Ô dữ liệu (Cell):** Điểm giao nhau giữa dòng và cột, chứa một giá trị duy nhất (đơn trị).
+
+*Ưu điểm lớn nhất:* Dữ liệu được sắp xếp ngay ngắn theo hàng theo lối, giúp máy tính có thể tìm kiếm, sắp xếp và tính điểm chỉ trong 1 phần nghìn giây!`,
         keyTakeaways: [
-          'Thứ tự các dòng và các cột trong bảng quan hệ không quan trọng.',
-          'Mỗi ô giao giữa dòng và cột chỉ chứa đúng 1 giá trị đơn trị (Atomic value).'
-        ]
+          'Bảng = Nhiều Cột (mục thông tin) + Nhiều Dòng (dữ liệu từng bạn học sinh).',
+          'Thứ tự các dòng trong bảng không quan trọng, máy tính có thể sắp xếp lại bất cứ lúc nào.'
+        ],
+        teacherNote: 'Thầy lưu ý: Các em cứ hình dung Bảng dữ liệu giống hệt như một bảng Excel trong máy tính, nhưng CSDL thông minh và an toàn hơn rất nhiều!'
       },
       {
-        id: 'sec-2-2',
-        title: '2. Các Loại Khóa trong CSDL Quan hệ: PK, FK, Candidate Key',
-        content: `Khóa là khái niệm quan trọng bậc nhất giúp phân biệt các dòng và tạo mối liên kết giữa các bảng:
-1. **Siêu khóa (Superkey):** Bất kỳ tập hợp một hoặc nhiều thuộc tính nào giúp phân biệt duy nhất từng dòng trong bảng.
-2. **Khóa ứng viên (Candidate Key):** Là siêu khóa tối thiểu (không thể bỏ bớt bất kỳ thuộc tính nào mà vẫn đảm bảo tính duy nhất).
-3. **Khóa chính (Primary Key - PK):** Là khóa ứng viên được người thiết kế CSDL lựa chọn làm định danh chính thức cho bảng.
-   - *Quy tắc vàng của PK:* Không được chứa giá trị NULL và không được trùng lặp giá trị giữa các dòng.
-   - *Khóa chính đơn (Simple PK):* Chỉ gồm 1 cột (ví dụ: MaSV).
-   - *Khóa chính hợp thành (Composite PK):* Gồm 2 cột trở lên (ví dụ trong bảng Kết quả: MaSV + MaMH).
-4. **Khóa ngoại (Foreign Key - FK):** Là một hoặc tập hợp các thuộc tính trong bảng Con tham chiếu đến Khóa chính của bảng Cha.
-   - *Ví dụ:* Cột \`MaLop\` trong bảng \`HocSinh\` là Khóa ngoại tham chiếu đến cột \`MaLop\` (Khóa chính) của bảng \`LopHoc\`.`,
+        id: 'sec-2-2-khoa-chinh',
+        title: '2. Khóa chính (Primary Key - PK): Chiếc "Thẻ Học Sinh" độc nhất vô nhị',
+        content: `**Tình huống thực tế:**
+Trong một trường học có 1.000 học sinh, có đến 3 bạn đều tên là "Nguyễn Văn Nam". Khi thầy cô nhập điểm 10 vào máy tính, làm sao phần mềm biết điểm 10 đó là của bạn Nam lớp 8A hay bạn Nam lớp 8C?
+-> **Giải pháp:** Nhà trường cấp cho mỗi bạn một **Mã học sinh (MaHS)** riêng biệt in trên Thẻ học sinh (ví dụ: HS001, HS002, HS003).
+
+Trong CSDL, cột chứa mã định danh đó được gọi là **Khóa chính (PRIMARY KEY - viết tắt là PK)**.
+
+**2 QUY TẮC VÀNG CỦA KHÓA CHÍNH (Học sinh cấp 2 cần ghi nhớ):**
+1. **Tính Duy Nhất (Unique):** Giá trị khóa chính ở mỗi dòng không bao giờ được phép trùng nhau.
+2. **Không được để trống (NOT NULL):** Bất cứ bạn học sinh nào đã được lưu vào bảng thì BẮT BUỘC phải có mã số, không được để trống ô này.
+
+*Lưu ý sư phạm quan trọng:*
+Ở bậc THCS, các em **hoàn toàn không cần học** các định nghĩa phức tạp như *Siêu khóa (Superkey)* hay *Khóa ứng viên (Candidate Key)*. Chỉ cần nắm vững Khóa chính là chiếc chìa khóa định danh duy nhất cho từng dòng dữ liệu!`,
         sqlExamples: [
           {
-            title: 'Khai báo Khóa chính và Khóa ngoại bằng SQL Server',
-            description: 'Định nghĩa bảng HocSinh có Khóa chính MaHS và Khóa ngoại MaLop',
+            title: 'Khai báo Khóa chính khi tạo Bảng Học sinh',
+            description: 'Đặt cột MaHS làm Khóa chính với từ khóa PRIMARY KEY',
             sql: `CREATE TABLE HocSinh (
-    MaHS VARCHAR(10) PRIMARY KEY,
+    MaHS VARCHAR(10) PRIMARY KEY, -- Khóa chính độc nhất
     HoTen NVARCHAR(100) NOT NULL,
-    NgaySinh DATE NOT NULL,
-    MaLop VARCHAR(10),
-    CONSTRAINT FK_HocSinh_LopHoc FOREIGN KEY (MaLop) REFERENCES LopHoc(MaLop)
+    GioiTinh NVARCHAR(5),
+    NgaySinh DATE
 );`,
-            explanation: 'Khóa chính MaHS ngăn chặn nhập trùng học sinh. Khóa ngoại MaLop đảm bảo học sinh chỉ có thể thuộc về một lớp học đã tồn tại trong bảng LopHoc.',
-            expectedResult: 'Bảng HocSinh được tạo thành công với 2 ràng buộc PK và FK.'
+            explanation: 'Khi thêm từ khóa PRIMARY KEY vào sau cột MaHS, hệ thống SQL Server sẽ tự động bảo vệ cột này: cấm nhập trùng mã và cấm để trống!',
+            expectedResult: 'Bảng HocSinh được tạo với cột MaHS là Khóa chính định danh duy nhất.'
           }
         ],
         keyTakeaways: [
-          'Khóa chính tạo tính định danh duy nhất cho mỗi dòng.',
-          'Khóa ngoại tạo mối liên kết ngữ nghĩa giữa các bảng trong CSDL.'
+          'Khóa chính (PK) là cột dùng để phân biệt duy nhất từng dòng trong bảng.',
+          'Khóa chính luôn luôn DUY NHẤT và KHÔNG ĐƯỢC RỖNG (NOT NULL).'
         ]
       },
       {
-        id: 'sec-2-3',
-        title: '3. Các Mối Quan Hệ Giữa Các Bảng & 4 Ràng Buộc Toàn Vẹn',
-        content: `Trong thế giới thực, các đối tượng luôn có mối liên hệ với nhau:
-- **Quan hệ 1 - 1 (Một - Một):** 1 dòng ở bảng A liên kết với duy nhất 1 dòng ở bảng B (ví dụ: 1 Sinh viên có duy nhất 1 Hồ sơ sức khỏe).
-- **Quan hệ 1 - N (Một - Nhiều):** 1 dòng ở bảng A liên kết với nhiều dòng ở bảng B, nhưng mỗi dòng ở bảng B chỉ thuộc về 1 dòng ở bảng A (ví dụ: 1 Lớp học có Nhiều Sinh viên; 1 Sinh viên chỉ thuộc 1 Lớp). Đây là loại quan hệ phổ biến nhất!
-- **Quan hệ N - N (Nhiều - Nhiều):** 1 Sinh viên học Nhiều Môn học; 1 Môn học có Nhiều Sinh viên theo học.
-  *Nguyên tắc thiết kế:* Quan hệ N - N không thể liên kết trực tiếp bằng 1 khóa ngoại mà BẮT BUỘC phải tách thành 2 quan hệ 1 - N thông qua một bảng trung gian (ví dụ bảng KetQua hoặc DangKy).
+        id: 'sec-2-3-vi-du-khoa-chinh',
+        title: '3. Vì sao không dùng Họ Tên hay Số Điện Thoại làm Khóa chính?',
+        content: `Rất nhiều bạn học sinh khi mới học CSDL thường thắc mắc: *"Tại sao không lấy luôn Tên bạn đó làm khóa chính cho dễ nhớ?"*
 
-*4 Ràng buộc toàn vẹn cơ bản bảo vệ CSDL:*
-1. **Toàn vẹn thực thể (Entity Integrity):** Khóa chính phải khác NULL và không trùng lặp.
-2. **Toàn vẹn tham chiếu (Referential Integrity):** Giá trị của khóa ngoại phải tồn tại ở bảng cha hoặc mang giá trị NULL. Không thể có một học sinh thuộc lớp '99Z' nếu lớp đó chưa được tạo!
-3. **Toàn vẹn miền giá trị (Domain Integrity):** Dữ liệu nhập vào phải đúng kiểu và thỏa mãn ràng buộc kiểm tra CHECK (ví dụ Điểm >= 0 AND Điểm <= 10).
-4. **Toàn vẹn do người dùng định nghĩa (User-defined Integrity):** Quy tắc nghiệp vụ riêng (ví dụ: Sinh viên chưa đóng học phí thì không được đăng ký thi).`,
+Hãy xem điều gì sẽ xảy ra:
+1. **Họ tên rất dễ trùng nhau:** Nếu trường có 2 bạn tên "Trần Mai Linh", khi bạn thứ hai nhập học, máy tính sẽ báo lỗi: *"Violation of PRIMARY KEY"* và từ chối lưu bạn thứ hai!
+2. **Họ tên và Số điện thoại có thể thay đổi:** Học sinh có thể đổi số điện thoại của bố mẹ, hoặc đổi sang số mới. Khóa chính thì nên ổn định suốt quá trình học tập.
+3. **Mã số ngắn gọn, tra cứu siêu tốc:** Mã \`HS001\` ngắn hơn rất nhiều so với chuỗi \`Nguyễn Hoàng Khánh Chi\`, giúp máy tính tìm kiếm nhanh gấp hàng chục lần.
+
+*Các ví dụ Khóa chính quen thuộc xung quanh chúng ta:*
+- Mã học sinh (\`MaHS\`) trên thẻ học sinh.
+- Số Căn cước công dân (\`CCCD\`) của công dân.
+- Mã số sách (\`MaSach\`) dán mã vạch ở thư viện trường.
+- Biển số xe máy, xe ô tô trên đường.`,
         keyTakeaways: [
-          'Mối quan hệ N-N luôn được phân rã thành 2 mối quan hệ 1-N thông qua bảng liên kết trung gian.',
-          'Ràng buộc toàn vẹn là tấm khiên vững chắc bảo vệ dữ liệu khỏi sai sót do con người nhập liệu.'
+          'Khóa chính tốt nhất là một mã định danh ngắn gọn, không trùng lặp và không thay đổi theo thời gian.'
         ]
       }
     ],
     practiceLevels: {
-      level1: 'Chỉ ra Khóa chính và Khóa ngoại trong mô hình quản lý sinh viên (LopHoc, SinhVien, MonHoc, KetQua).',
-      level2: 'Giải thích tại sao không thể liên kết trực tiếp quan hệ Nhiều - Nhiều giữa SinhVien và MonHoc bằng 1 cột khóa ngoại duy nhất.',
-      level3: 'Thiết kế lược đồ quan hệ cho hệ thống Quản lý Bán hàng gồm KhachHang, SanPham, HoaDon, ChiTietHoaDon và chỉ rõ các khóa PK, FK.'
+      level1: 'Hãy nhìn vào Thẻ học sinh của em. Mục thông tin nào trên thẻ có tính chất độc nhất vô nhị để làm Khóa chính?',
+      level2: 'Giải thích vì sao trong phần mềm quản lý thư viện của trường, cô thủ thư không dùng "Tên cuốn sách" làm khóa chính mà lại dán mã vạch riêng lên từng cuốn.',
+      level3: 'Hãy viết câu lệnh SQL SELECT để xem toàn bộ danh sách học sinh và chỉ ra cột nào đóng vai trò Khóa chính trong bảng HocSinh.'
     },
     endOfLessonReview: {
-      summaryQuestion: 'Toàn vẹn tham chiếu là gì và hệ quản trị CSDL sẽ làm gì nếu bạn cố tình xóa một Lớp học đang có 40 sinh viên theo học?',
-      sqlChallenge: `SELECT H.MaHS, H.HoTen, L.TenLop, M.TenMH, K.DiemTB 
-FROM HocSinh H 
-JOIN LopHoc L ON H.MaLop = L.MaLop
-JOIN KetQua K ON H.MaHS = K.MaHS
-JOIN MonHoc M ON K.MaMH = M.MaMH;`,
-      scenarioQuestion: 'Một nhân viên thu ngân nhập hóa đơn cho khách hàng nhưng gõ nhầm mã khách hàng chưa đăng ký. Ràng buộc nào sẽ kích hoạt và phản hồi ra sao?',
-      teacherAnswerKey: 'Ràng buộc Toàn vẹn tham chiếu (Foreign Key Constraint) sẽ kích hoạt và chặn ngay lập tức hành động thêm hóa đơn với thông báo lỗi: The INSERT statement conflicted with the FOREIGN KEY constraint.'
+      summaryQuestion: 'Khóa chính (PRIMARY KEY) là gì và nêu 2 quy tắc vàng bắt buộc của Khóa chính?',
+      sqlChallenge: "SELECT MaHS, HoTen, GioiTinh FROM HocSinh WHERE GioiTinh = N'Nữ';",
+      scenarioQuestion: 'Bạn An và bạn Bình cùng sinh ngày 20/11/2011 và cùng tên là Lê Quốc Bảo. Nhờ có thành phần nào trong bảng dữ liệu mà thầy cô không bao giờ bị ghi nhầm điểm thi giữa 2 bạn?',
+      teacherAnswerKey: 'Nhờ có Khóa chính (cột MaHS). Dù 2 bạn trùng cả họ tên lẫn ngày sinh, mỗi bạn vẫn có một MaHS độc nhất (ví dụ HS001 và HS002) giúp phân biệt chính xác 100%!'
+    }
+  },
+
+  {
+    id: 'bai-2-2-khoa-ngoai-lien-ket-bang',
+    chapterId: 'chuong-2',
+    chapterTitle: 'Chương 2: Cấu trúc Bảng, Khóa Chính & Khóa Ngoại (Nền tảng THCS)',
+    title: 'Bài 2.2: Khóa Ngoại (Foreign Key) & Mối Liên Kết Giữa Các Bảng',
+    description: 'Tìm hiểu Khóa ngoại (FOREIGN KEY) - "sợi dây kết nối" thần kỳ giữa các bảng dữ liệu, mối quan hệ 1-N (1 lớp có nhiều học sinh), giúp ngăn chặn lỗi nhập lớp học không tồn tại.',
+    level: 'co-ban',
+    competency: 'csdl-quan-he',
+    estimatedMinutes: 20,
+    prerequisites: [
+      'Bài 2.1: Cấu trúc Bảng & Khóa Chính (Primary Key) - Định danh Học sinh'
+    ],
+    learningObjectives: [
+      'Hiểu vì sao nhà trường cần chia thành nhiều bảng (Bảng Lớp học riêng, Bảng Học sinh riêng) thay vì dồn tất cả vào một bảng khổng lồ.',
+      'Nắm vững khái niệm Khóa ngoại (Foreign Key - FK): Cột đóng vai trò tham chiếu đến Khóa chính của bảng khác để tạo mối liên kết.',
+      'Hiểu cơ chế bảo vệ của Khóa ngoại: Chặn ngay hành vi xếp học sinh vào một lớp học chưa từng tồn tại trong trường.',
+      'Nhận biết mối quan hệ Một - Nhiều (1-N) gần gũi: 1 Lớp học có Nhiều học sinh; mỗi học sinh chỉ thuộc về 1 Lớp học.',
+      'Biết cách khai báo Khóa ngoại trong SQL và thử nghiệm ghép 2 bảng đơn giản bằng từ khóa JOIN.'
+    ],
+    relatedTable: 'LopHoc',
+    suggestedPracticeSql: "SELECT HocSinh.MaHS, HocSinh.HoTen, LopHoc.TenLop, LopHoc.GVCN FROM HocSinh INNER JOIN LopHoc ON HocSinh.MaLop = LopHoc.MaLop;",
+    mermaidDiagram: `graph LR
+      subgraph Bang_Cha [BẢNG LỚP HỌC (LopHoc - Bảng Cha)]
+        PK["⭐ MaLop: '8A' (Khóa chính)"]
+        TenLop["TenLop: 'Lớp 8A'"]
+      end
+
+      subgraph Bang_Con [BẢNG HỌC SINH (HocSinh - Bảng Con)]
+        HS1["HS001 - An <br/>🔗 MaLop: '8A' (Khóa ngoại)"]
+        HS2["HS002 - Bình <br/>🔗 MaLop: '8A' (Khóa ngoại)"]
+      end
+
+      PK -.->|"Tham chiếu / Kết nối"| HS1
+      PK -.->|"1 Lớp có nhiều Học sinh (1-N)"| HS2`,
+    commonMistakes: [
+      {
+        mistake: 'Gộp chung toàn bộ thông tin Tên lớp, Phòng học, Tên GVCN vào từng dòng của Bảng Học sinh.',
+        correction: 'Nếu làm vậy, thông tin lớp 8A sẽ phải gõ lặp lại 40 lần cho 40 bạn học sinh. Khi đổi giáo viên chủ nhiệm, ta phải đi sửa cả 40 dòng! Bằng cách tách riêng bảng LopHoc và dùng Khóa ngoại liên kết, ta chỉ cần sửa đúng 1 dòng duy nhất trong bảng LopHoc.',
+        why: 'Khóa ngoại giúp dữ liệu gọn gàng, không bị dư thừa và cập nhật cực kỳ nhanh chóng.'
+      },
+      {
+        mistake: 'Nhập một Mã lớp không có thật trong trường vào thông tin của học sinh.',
+        correction: 'Nếu trường chỉ có các lớp 8A, 8B, 8C, bạn nhập lớp 8Z thì hệ thống sẽ báo lỗi vi phạm Khóa ngoại (The INSERT statement conflicted with the FOREIGN KEY constraint) và từ chối lưu.',
+        why: 'Khóa ngoại đảm bảo tính toàn vẹn tham chiếu: học sinh chỉ có thể thuộc về một lớp học đang thực sự tồn tại.'
+      }
+    ],
+    sections: [
+      {
+        id: 'sec-2-2-1-tai-sao-can-nhieu-bang',
+        title: '1. Tại sao cần nhiều Bảng và cần "Chiếc cầu nối"?',
+        content: `Hãy tưởng tượng nếu nhà trường lưu toàn bộ dữ liệu vào **MỘT BẢNG DUY NHẤT**:
+| MaHS | HoTen | MaLop | TenLop | PhongHoc | GVCN | MonHoc | DiemThi |
+|---|---|---|---|---|---|---|---|
+| HS001 | Nguyễn Quốc Anh | 8A | Lớp 8A | P.201 | Cô Mai | Tin học | 9.5 |
+| HS002 | Trần Mai Linh | 8A | Lớp 8A | P.201 | Cô Mai | Tin học | 9.0 |
+
+**Hậu quả tai hại:**
+- Tên lớp "Lớp 8A", phòng "P.201", giáo viên "Cô Mai" bị gõ lặp đi lặp lại hàng trăm lần.
+- Rất dễ gõ sai chính tả (bạn thì gõ "Lớp 8A", bạn thì gõ "lop 8a").
+- Khi cô Mai chuyển công tác, người quản trị phải tìm và sửa hàng trăm dòng!
+
+**Giải pháp thông minh của Cơ sở Dữ liệu Quan hệ:**
+Chia làm 2 bảng chuyên biệt:
+1. **Bảng [LopHoc] (Bảng Cha):** Chỉ lưu danh sách các lớp. Mỗi lớp lưu đúng 1 dòng duy nhất (\`MaLop\`, \`TenLop\`, \`GVCN\`).
+2. **Bảng [HocSinh] (Bảng Con):** Mỗi bạn học sinh chỉ cần ghi ngắn gọn mã lớp của mình (\`MaLop = '8A'\`).`,
+        keyTakeaways: [
+          'Tách bảng giúp tránh dư thừa dữ liệu và tránh sai sót khi cập nhật thông tin.',
+          'Khóa ngoại đóng vai trò chiếc cầu nối giữa 2 bảng.'
+        ]
+      },
+      {
+        id: 'sec-2-2-2-khoa-ngoai-la-gi',
+        title: '2. Khóa ngoại (Foreign Key - FK) là gì?',
+        content: `**Khóa ngoại (FOREIGN KEY - viết tắt là FK)** là một cột trong bảng này dùng để tham chiếu (trỏ) sang cột **Khóa chính** của một bảng khác.
+
+- **Bảng Cha (Parent Table):** Bảng chứa Khóa chính được tham chiếu đến (ví dụ: Bảng \`LopHoc\` với khóa chính \`MaLop\`).
+- **Bảng Con (Child Table):** Bảng chứa Khóa ngoại tham chiếu sang bảng cha (ví dụ: Bảng \`HocSinh\` với cột khóa ngoại \`MaLop\`).
+
+**Ý nghĩa bảo vệ kỳ diệu của Khóa ngoại:**
+Nếu một bạn học sinh mới chuyển đến và nhân viên vô tình gõ mã lớp là \`8Z\` (trong khi trường chỉ có lớp 8A, 8B, 8C), hệ thống SQL sẽ ngay lập tức "tu còi" chặn lại:
+> *"Lỗi: Không tìm thấy lớp học 8Z trong bảng LopHoc!"*
+
+Nhờ có Khóa ngoại, không bao giờ xảy ra trường hợp một bạn học sinh bị xếp vào một lớp học "ma" không có thật!`,
+        sqlExamples: [
+          {
+            title: 'Khai báo Khóa ngoại liên kết giữa Bảng Học sinh và Lớp học',
+            description: 'Tạo bảng HocSinh có cột MaLop tham chiếu đến bảng LopHoc',
+            sql: `CREATE TABLE HocSinh (
+    MaHS VARCHAR(10) PRIMARY KEY,
+    HoTen NVARCHAR(100) NOT NULL,
+    MaLop VARCHAR(10),
+    CONSTRAINT FK_HocSinh_LopHoc FOREIGN KEY (MaLop) REFERENCES LopHoc(MaLop)
+);`,
+            explanation: 'Dòng lệnh CONSTRAINT FK_HocSinh_LopHoc FOREIGN KEY (MaLop) REFERENCES LopHoc(MaLop) tạo sợi dây liên kết an toàn giữa 2 bảng.',
+            expectedResult: 'Bảng HocSinh được liên kết chặt chẽ với bảng LopHoc.'
+          }
+        ],
+        keyTakeaways: [
+          'Khóa ngoại là cột trong bảng con trỏ sang Khóa chính của bảng cha.',
+          'Khóa ngoại ngăn chặn nhập dữ liệu rác hoặc dữ liệu không tồn tại.'
+        ]
+      },
+      {
+        id: 'sec-2-2-3-moi-quan-he-1-n',
+        title: '3. Mối quan hệ Một - Nhiều (1-N) và Ghép Bảng đơn giản',
+        content: `Mối quan hệ phổ biến nhất giữa các bảng trong trường học là **Quan hệ Một - Nhiều (1-N)**:
+- **1 Lớp học** có thể chứa **Nhiều học sinh** (Ví dụ: Lớp 8A có 40 bạn).
+- Nhưng **mỗi học sinh** chỉ thuộc về **1 Lớp học** duy nhất tại một thời điểm.
+
+**Làm sao để xem danh sách học sinh kèm tên lớp?**
+Nhờ có Khóa ngoại, chúng ta dùng từ khóa \`JOIN\` trong SQL để ghép 2 bảng lại với nhau:
+
+\`\`\`sql
+SELECT HocSinh.MaHS, HocSinh.HoTen, LopHoc.TenLop, LopHoc.GVCN
+FROM HocSinh
+JOIN LopHoc ON HocSinh.MaLop = LopHoc.MaLop;
+\`\`\`
+
+Kết quả trả về sẽ hiển thị đầy đủ tên học sinh, cùng với tên lớp và tên giáo viên chủ nhiệm tương ứng!`,
+        keyTakeaways: [
+          'Quan hệ 1-N là mối quan hệ phổ biến nhất trong CSDL (1 Lớp có nhiều Học sinh).',
+          'Từ khóa JOIN kết hợp với Khóa ngoại giúp ghép thông tin từ nhiều bảng thành một bảng kết quả dễ đọc.'
+        ]
+      }
+    ],
+    practiceLevels: {
+      level1: 'Trong mô hình quản lý trường học gồm Bảng LopHoc và Bảng HocSinh, bảng nào là Bảng Cha, bảng nào là Bảng Con?',
+      level2: 'Điều gì sẽ xảy ra nếu nhà trường xóa đi Lớp 8B trong khi vẫn còn 35 bạn học sinh đang thuộc lớp 8B?',
+      level3: 'Hãy thực thi câu lệnh SQL ghép bảng (JOIN) giữa HocSinh và LopHoc để xem danh sách các bạn học sinh lớp 8A.'
+    },
+    endOfLessonReview: {
+      summaryQuestion: 'Khóa ngoại (FOREIGN KEY) là gì và mang lại lợi ích gì cho việc quản lý dữ liệu?',
+      sqlChallenge: "SELECT HocSinh.MaHS, HocSinh.HoTen, LopHoc.TenLop, LopHoc.GVCN FROM HocSinh INNER JOIN LopHoc ON HocSinh.MaLop = LopHoc.MaLop WHERE LopHoc.TenLop = N'Lớp 8A';",
+      scenarioQuestion: 'Nếu thầy giám thị cố tình xóa lớp học 8A khỏi bảng LopHoc trong khi vẫn còn học sinh đang học, hệ quản trị CSDL sẽ làm gì?',
+      teacherAnswerKey: 'Hệ quản trị CSDL sẽ chặn ngay hành động xóa và báo lỗi vi phạm Khóa ngoại (Foreign Key constraint), để bảo vệ các bạn học sinh không bị rơi vào tình trạng "mất lớp học"!'
     }
   },
 
@@ -257,7 +410,7 @@ JOIN MonHoc M ON K.MaMH = M.MaMH;`,
     competency: 'thiet-ke-rang-buoc',
     estimatedMinutes: 45,
     prerequisites: [
-      'Bài 2: Bảng, Dòng, Cột, Khóa chính & Khóa ngoại'
+      'Bài 2.1 & 2.2: Khóa chính và Khóa ngoại trong CSDL'
     ],
     learningObjectives: [
       'Biết cách thu thập và phân tích yêu cầu dữ liệu từ bài toán thực tế của doanh nghiệp/trường học.',
